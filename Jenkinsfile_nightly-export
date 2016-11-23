@@ -24,7 +24,7 @@ node {
    
    def exportOutputFolder = "deployments"
    
-   def solutionsToExport = "globis_deployment,globis_framework,globis_metadata,globis_webservice,globis_webservice_system"
+   def solutionsToExport = "globis_deployment,globis_framework,globis_webservice,globis_webservice_system"
    
    def versionInfoFilePath = "${workspaceSolutionsDir}/build_files/VersionInfo.txt"
    
@@ -44,6 +44,9 @@ node {
    def webserviceSolutionFile = "globis_webservice.servoy"
    def webserviceSystemSolutionFile = "globis_webservice_system.servoy"
    
+   def releaseFileShare = "\\\\SRV16001\\ReleaseFiles"
+   def releaseFileShareEscaped = "\\\\\\\\SRV16001\\\\ReleaseFiles"
+   
    try {
    stage('settings log') {
 	slacknotifier.notifyBuild('STARTED')
@@ -55,17 +58,7 @@ node {
     echo "${exportServoyProperties}"
     
    }
-   
-   stage('Get script sources from GIT') { // for display purposes
-      // Get some code from a GitHub repository
-      checkout([$class: 'GitSCM', 
-                branches: [[name: '*/master']], 
-                doGenerateSubmoduleConfigurations: false, 
-                extensions: [[$class: 'RelativeTargetDirectory', 
-                relativeTargetDir: 'build_scripts']], 
-                submoduleCfg: [], 
-                userRemoteConfigs: [[url: 'git@github_jenkins:pdemeyer/software_factory_build_scripts.git']]])
-   }
+
    stage('Get Globis source code from GIT') { // for display purposes
       // Get some code from a GitHub repository
       //git url:'git@github_jenkins:globisnv/globis-online.git', branch:'*/10.3.12/10.3.12'
@@ -135,47 +128,19 @@ node {
         echo out_str     
    }
    
-   stage('Deploy To Release file exporter') {
-   		try {
-        	solutionimporter.importSolutions("${exportOutputFolder}/${metadataSolutionFile}", releaseFileExporterUrl, false)
-		} catch (e) {
-    		// If there was an exception thrown, the build failed
-    		currentBuild.result = "FAILED"
-    		throw e
-		} 
-   		try {
-        	solutionimporter.importSolutions("${exportOutputFolder}/${webserviceSolutionFile}", releaseFileExporterUrl, true)
-		} catch (e) {
-    		// If there was an exception thrown, the build failed
-    		currentBuild.result = "FAILED"
-    		throw e
-		} 
-   		try {
-        	solutionimporter.importSolutions("${exportOutputFolder}/${webserviceSystemSolutionFile}", releaseFileExporterUrl, true)
-		} catch (e) {
-    		// If there was an exception thrown, the build failed
-    		currentBuild.result = "FAILED"
-    		throw e
-		} 
-   }
-    
-    stage('Clean up Release file Share') {
-       // bat script: "del *.xml " 
-    }
-   
    stage('Export Release files') {
        httpRequest acceptType: "APPLICATION_JSON", 
             consoleLogResponseBody: true, 
             contentType: "APPLICATION_JSON", 
             httpMode: 'POST', 
-            requestBody: '{server_path: "\\\\\\\\SRV16001\\\\ReleaseFiles", owner_ids: ["88888888-8888-8888-8888-888888888888"], type:"D"}', 
+            requestBody: "{server_path: \"${releaseFileShareEscaped}\", owner_ids: [\"88888888-8888-8888-8888-888888888888\"], type:\"D\"}", 
             timeout: 60, 
             url: "http://${releaseFileExporterUrl}/servoy-service/api_v1/88888888-8888-8888-8888-888888888888/admin/exportreleasefiles", 
             validResponseContent: '{"messages":[]}'
    }
     
     stage('Copy over release files to artifacts folder') {
-        bat script: "xcopy /Y /s \"\\\\SRV16001\\ReleaseFiles\\${releaseFilesPattern}\" \"${exportOutputFolder}\"" 
+        bat script: "xcopy /Y /s \"${releaseFileShare}\\${releaseFilesPattern}\" \"${exportOutputFolder}\"" 
     }
    
    

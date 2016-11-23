@@ -44,6 +44,7 @@ node {
    def webserviceSolutionFile = "globis_webservice.servoy"
    def webserviceSystemSolutionFile = "globis_webservice_system.servoy"
    
+   
    try {
    stage('settings log') {
 	slacknotifier.notifyBuild('STARTED')
@@ -81,7 +82,6 @@ node {
     }
     
     stage('Export Solution files') {
-       
        solutionexporter.exportSolutions(${equinoxJar}, ${servoyAppServerHome}, ${solutionsToExport}, ${exportOutputFolder}, ${exportServoyProperties)
    }
    
@@ -107,40 +107,6 @@ node {
     		currentBuild.result = "FAILED"
     		throw e
 		} 
-   }
-    
-   
-   stage('Export Release files') {
-       httpRequest acceptType: "APPLICATION_JSON", 
-            consoleLogResponseBody: true, 
-            contentType: "APPLICATION_JSON", 
-            httpMode: 'POST', 
-            requestBody: '{server_path: "\\\\\\\\SRV16001\\\\ReleaseFiles", owner_ids: ["88888888-8888-8888-8888-888888888888"], type:"D"}', 
-            timeout: 60, 
-            url: "http://${releaseFileExporterUrl}/servoy-service/api_v1/88888888-8888-8888-8888-888888888888/admin/exportreleasefiles", 
-            validResponseContent: '{"messages":[]}'
-   }
-    
-    stage('Copy over release files to artifacts folder') {
-        bat script: "xcopy /Y /s \"\\\\SRV16001\\ReleaseFiles\\${releaseFilesPattern}\" \"${exportOutputFolder}\"" 
-    }
-   
-   
-   
-   stage('Commit & push to Artefacts GIT') {
-       
-        //bat script: "git -C ${exportOutputFolder} config --global user.name globis-jenkins"
-        //bat script: "git -C ${exportOutputFolder} config --global user.email pdemeyer@outlook"
-        
-        /* we have now a detached head, and fix this by doing a checkout again */
-        bat script: "git -C ${exportOutputFolder} checkout -B \"${artefactsBranchName}\""
-        bat script: "git -C ${exportOutputFolder} add ${publishFilesPattern}"
-        bat script: "git -C ${exportOutputFolder} add ${releaseFilesPattern}"
-        bat script: "git -C ${exportOutputFolder} commit --all -m \"${versionTag}\" --author=\"globis-jenkins <pdemeyer@outlook.be>\""
-        bat script: "git -C ${exportOutputFolder} tag -a \"${versionTag}\" -m \"${versionComment}\""
-        bat script: "git -C ${exportOutputFolder} push --all"
-        bat script: "git -C ${exportOutputFolder} push --tags"
-       
    }
    
    
