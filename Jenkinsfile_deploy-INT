@@ -11,8 +11,8 @@ import org.apache.commons.httpclient.methods.multipart.*
 node {
 
 	def rootDir = pwd()
-    def slacknotifier = load "${rootDir}@script/lib/notification_slack.groovy "
-    def solutionimporter = load "${rootDir}@script/lib/solution_import.groovy "
+    def slacknotifier = load "${rootDir}@script/lib/notification_slack.groovy"
+    def solutionimporter = load "${rootDir}@script/lib/solution_import.groovy"
 
   try {
       
@@ -39,8 +39,8 @@ node {
    def publishFilesPattern = '*.servoy'
    def releaseFilesPattern = "*.xml"
    
-   def releaseFileShare = "\\\\SRV16001\\ReleaseFiles"
-   def releaseFileShareEscaped = "\\\\\\\\SRV16001\\\\ReleaseFiles"
+   def releaseFileShare = "\\\\GLOBIS-INT\\ReleaseFiles"
+   def releaseFileShareEscaped = "\\\\\\\\GLOBIS-INT\\\\ReleaseFiles"
    
    def targetServerUrl = "192.168.73.159:8090"
    
