@@ -1,0 +1,222 @@
+import org.apache.commons.httpclient.*
+
+import org.apache.commons.httpclient.auth.*
+import org.apache.commons.httpclient.methods.*
+import org.apache.commons.httpclient.methods.multipart.*
+
+//@Grab(group='commons-httpclient', module='commons-httpclient', version='3.1')
+
+
+
+node {
+  try {
+      
+    def servoyHome = "C:/Servoy"
+   def servoyDeveloperHome = "${servoyHome}/developer"
+   def servoyAppServerHome = "${servoyHome}/application_server"
+   def equinoxJar = "${servoyDeveloperHome}/plugins/org.eclipse.equinox.launcher_1.3.0.v20130327-1440.jar"
+   
+   def workspaceSolutionsDir = "globis_online_repo"
+   def servoyPropertiesDir = "${workspaceSolutionsDir}/build_files/servoy_properties_file"
+   
+   def exportServoyProperties = "${servoyPropertiesDir}/exporter_servoy.properties"
+   
+   def exportOutputFolder = "deployments"
+   
+   def versionInfoFilePath = "${workspaceSolutionsDir}/build_files/VersionInfo.txt"
+   
+   def versionEnvironmentPrefix = ""
+   def versionNumber = ""
+   def versionTag = "10.3.12-DEBUG"
+   def versionComment = "test comment"
+   
+   def artefactsBranchName = "master"
+   def publishFilesPattern = '*.servoy'
+   def releaseFilesPattern = "*.xml"
+   
+   def releaseFileShare = "\\\\SRV16001\\ReleaseFiles"
+   def releaseFileShareEscaped = "\\\\\\\\SRV16001\\\\ReleaseFiles"
+   
+   def targetServerUrl = "192.168.73.159:8090"
+   
+   def metadataSolutionFile = "globis_metadata.servoy"
+   def webserviceSolutionFile = "globis_webservice.servoy"
+   def webserviceSystemSolutionFile = "globis_webservice_system.servoy"
+   def deploymentSolutionFile = "globis_deployment.servoy"
+   
+   
+    stage('settings log') {
+	    notifyBuild('STARTED')
+	
+        echo "${servoyHome}"
+        echo "${servoyDeveloperHome}"
+        echo "${workspaceSolutionsDir}"
+        echo "${servoyPropertiesDir}"
+        echo "${exportServoyProperties}"
+   }
+     
+    stage('Sync artifacts GIT') { // for display purposes
+          // Get some code from a GitHub repository
+          //git url:'git@github_jenkins:globisnv/globis-artifacts.git', branch:'*/10.3.12'
+          checkout([$class: 'GitSCM', 
+                    branches: [[name: "${artefactsBranchName}"]], 
+                    doGenerateSubmoduleConfigurations: false, 
+                    extensions: [[$class: 'RelativeTargetDirectory', 
+                    relativeTargetDir: "${exportOutputFolder}"]], 
+                    submoduleCfg: [], 
+                    userRemoteConfigs: [[url: 'git@github_jenkins:globisnv/globis-artifacts.git']]])
+    }
+    
+    stage('Copy over release files to import folder') {
+        bat script: "xcopy /s /Y \"${exportOutputFolder}\\${releaseFilesPattern}\" \"${releaseFileShare}\"" 
+    }
+    
+    stage('Deploy Webservice solutions') {
+  
+   		try {
+        	echo "importing solution " + "${exportOutputFolder}/${webserviceSolutionFile}"
+        	importSolutions("${exportOutputFolder}/${webserviceSolutionFile}", targetServerUrl, true)
+		} catch (e) {
+    		// If there was an exception thrown, the build failed
+    		currentBuild.result = "FAILED"
+    		throw e
+		} 
+   		try {
+        	echo "importing solution " + "${exportOutputFolder}/${webserviceSystemSolutionFile}"
+        	importSolutions("${exportOutputFolder}/${webserviceSystemSolutionFile}", targetServerUrl, true)
+		} catch (e) {
+    		// If there was an exception thrown, the build failed
+    		currentBuild.result = "FAILED"
+    		throw e
+		} 
+   }
+    
+    stage('Import Release files') {
+       httpRequest acceptType: "APPLICATION_JSON", 
+            consoleLogResponseBody: true, 
+            contentType: "APPLICATION_JSON", 
+            httpMode: 'POST', 
+            requestBody: "{server_path: \"${releaseFileShareEscaped}\", owner_ids: [\"88888888-8888-8888-8888-888888888888\"]}", 
+            timeout: 60, 
+            url: "http://${targetServerUrl}/servoy-service/api_v1/88888888-8888-8888-8888-888888888888/admin/importreleasefiles"
+            //, 
+            //validResponseContent: '{"messages":[]}'
+   }
+      
+   stage ('Import solution on server') {
+        echo "importing solution " + "${exportOutputFolder}/${deploymentSolutionFile}"
+        importSolutions("${exportOutputFolder}/${deploymentSolutionFile}", targetServerUrl, false)
+   }
+} catch (e) {
+    // If there was an exception thrown, the build failed
+    currentBuild.result = "FAILED"
+    throw e
+} finally {
+    // Success or failure, always send notifications
+    notifyBuild(currentBuild.result)
+}
+}
+
+def importSolutions(String solutionFilePath, String serverUrl, boolean allowDBModelChanges = false) {
+
+  def server = "server"
+  def importTargetUrl = "http://${serverUrl}/servoy-admin/solutions/import"
+  def projectName = "INT"
+
+  def username = "globisadmin"
+  def apiToken = "Pwd49lo815"
+
+
+  def client = new HttpClient()
+  client.state.setCredentials(
+    AuthScope.ANY,
+    new UsernamePasswordCredentials( username, apiToken )
+  )
+
+  // Jenkins does not do any authentication negotiation,
+  // ie. it does not return a 401 (Unauthorized)
+  // but immediately a 403 (Forbidden)
+  client.params.authenticationPreemptive = true
+
+  def post = new PostMethod( "${importTargetUrl}" )
+  post.doAuthentication = true
+  
+  def workspace = pwd()
+  File input = new File(workspace + "/" + solutionFilePath);
+  RequestEntity entity = new FileRequestEntity(input, "application/octet-stream; charset=UTF-8");
+  post.setRequestEntity(entity);
+  
+  Part[] multiParts = new Part[10];
+  
+  if (allowDBModelChanges) {
+  	multiParts = new Part[11];
+  }
+  
+  //Part[] multiParts = {
+  multiParts[0] = new StringPart("emm", "on"); //Enter maintenance mode
+  multiParts[1] = new StringPart("ac", "on");  //activate new release
+  multiParts[2] = new StringPart("newname", ""); //use a new name stays empty
+  multiParts[3] = new StringPart("fd", "on");  //override existing default values
+  multiParts[4] = new StringPart("ak", "on");  //Allow reserved keywords
+  multiParts[5] = new StringPart("id", "on");  //Import i18n  data (insert & update)
+  multiParts[6] = new StringPart("md", "on");  //import solution meta data
+  multiParts[7] = new StringPart("solution_password", ""); //solution pwd empty
+  multiParts[8] = new StringPart("submit", "Import!");  //submit button
+   
+  if (allowDBModelChanges) {
+  	multiParts[10] = new StringPart("dm", "on");  //allow data model database changes
+  }
+  
+  post.addParameter("solution_password", "");
+  post.addParameter("submit", "Import!");
+  multiParts[9] = new FilePart("if", "if", input, "application/octet-stream", "charset=UTF-8");
+
+  post.setRequestEntity(
+      new MultipartRequestEntity(multiParts, post.getParams())
+      );
+  
+  try {
+    int result = client.executeMethod(post)
+    println "Return code: ${result}"
+    string body = post.getResponseBodyAsString();
+    println body;
+    if (body.indexOf("[error]") > -1) 
+        currentBuild.result = 'FAILURE'
+  } finally {
+    	post.releaseConnection()
+  }
+
+}
+
+
+def notifyBuild(String buildStatus = 'STARTED') {
+  // build status of null means successful
+  buildStatus =  buildStatus ?: 'SUCCESSFUL'
+
+  // Default values
+  def colorName = 'RED'
+  def colorCode = '#FF0000'
+  def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
+  def summary = "${subject} (${env.BUILD_URL})"
+  def details = """<p>STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
+    <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>"""
+
+  // Override default values based on build status
+  if (buildStatus == 'STARTED') {
+    color = 'YELLOW'
+    colorCode = '#FFFF00'
+  } else if (buildStatus == 'SUCCESSFUL') {
+    color = 'GREEN'
+    colorCode = '#00FF00'
+  } else {
+    color = 'RED'
+    colorCode = '#FF0000'
+  }
+
+  // Send notifications
+  //slackSend (color: colorCode, message: summary)
+}
+
+def sendPostRequest(urlString, paramString) {
+
+}
