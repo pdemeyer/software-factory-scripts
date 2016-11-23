@@ -11,7 +11,7 @@ import org.apache.commons.httpclient.methods.multipart.*
 node {
 
 	def rootDir = pwd()
-    def slacknotifier = load "${rootDir}/lib/notification_slack.groovy "
+    def slacknotifier = load "${rootDir}@script/lib/notification_slack.groovy "
 
   try {
       
