@@ -7,6 +7,11 @@ import org.apache.commons.httpclient.methods.multipart.*
 
 node {
     
+	def rootDir = pwd()
+    def slacknotifier = load "${rootDir}@script/lib/notification_slack.groovy"
+    def solutionimporter = load "${rootDir}@script/lib/solution_import.groovy"
+    
+    
    def servoyHome = "C:/Servoy"
    def servoyDeveloperHome = "${servoyHome}/developer"
    def servoyAppServerHome = "${servoyHome}/application_server"
@@ -41,7 +46,7 @@ node {
    
    try {
    stage('settings log') {
-	notifyBuild('STARTED')
+	slacknotifier.notifyBuild('STARTED')
 	
     echo "${servoyHome}"
     echo "${servoyDeveloperHome}"
@@ -132,24 +137,21 @@ node {
    
    stage('Deploy To Release file exporter') {
    		try {
-        	echo "importing solution " + "${exportOutputFolder}/${metadataSolutionFile}"
-        	importSolutions("${exportOutputFolder}/${metadataSolutionFile}", releaseFileExporterUrl, false)
+        	solutionimporter.importSolutions("${exportOutputFolder}/${metadataSolutionFile}", releaseFileExporterUrl, false)
 		} catch (e) {
     		// If there was an exception thrown, the build failed
     		currentBuild.result = "FAILED"
     		throw e
 		} 
    		try {
-        	echo "importing solution " + "${exportOutputFolder}/${webserviceSolutionFile}"
-        	importSolutions("${exportOutputFolder}/${webserviceSolutionFile}", releaseFileExporterUrl, true)
+        	solutionimporter.importSolutions("${exportOutputFolder}/${webserviceSolutionFile}", releaseFileExporterUrl, true)
 		} catch (e) {
     		// If there was an exception thrown, the build failed
     		currentBuild.result = "FAILED"
     		throw e
 		} 
    		try {
-        	echo "importing solution " + "${exportOutputFolder}/${webserviceSystemSolutionFile}"
-        	importSolutions("${exportOutputFolder}/${webserviceSystemSolutionFile}", releaseFileExporterUrl, true)
+        	solutionimporter.importSolutions("${exportOutputFolder}/${webserviceSystemSolutionFile}", releaseFileExporterUrl, true)
 		} catch (e) {
     		// If there was an exception thrown, the build failed
     		currentBuild.result = "FAILED"
@@ -194,13 +196,6 @@ node {
        
    }
    
-   /*
-   stage('Results') {
-      junit '** /target/surefire-reports/TEST-*.xml'  //remove space...
-      archive 'target/*.jar'
-   }
-   */
-   
    
    } catch (e) {
     // If there was an exception thrown, the build failed
@@ -208,110 +203,8 @@ node {
     throw e
   } finally {
     // Success or failure, always send notifications
-    notifyBuild(currentBuild.result)
+    slacknotifier.notifyBuild(currentBuild.result)
   }
-}
-
-def importSolutions(String solutionFilePath, String serverUrl, boolean allowDBModelChanges = false) {
-
-  def server = "server"
-  def importTargetUrl = "http://${serverUrl}/servoy-admin/solutions/import"
-  def projectName = "INT"
-
-  def username = "globisadmin"
-  def apiToken = "Pwd49lo815"
-
-
-  def client = new HttpClient()
-  client.state.setCredentials(
-    AuthScope.ANY,
-    new UsernamePasswordCredentials( username, apiToken )
-  )
-
-  // Jenkins does not do any authentication negotiation,
-  // ie. it does not return a 401 (Unauthorized)
-  // but immediately a 403 (Forbidden)
-  client.params.authenticationPreemptive = true
-
-  def post = new PostMethod( "${importTargetUrl}" )
-  post.doAuthentication = true
-  
-  def workspace = pwd()
-  File input = new File(workspace + "/" + solutionFilePath);
-  RequestEntity entity = new FileRequestEntity(input, "application/octet-stream; charset=UTF-8");
-  post.setRequestEntity(entity);
-  
-  Part[] multiParts = new Part[10];
-  
-  if (allowDBModelChanges) {
-  		multiParts = new Part[11];
-  }
-  
-  //Part[] multiParts = {
-  multiParts[0] = new StringPart("emm", "on"); //Enter maintenance mode
-  multiParts[1] = new StringPart("ac", "on");  //activate new release
-  multiParts[2] = new StringPart("newname", ""); //use a new name stays empty
-  multiParts[3] = new StringPart("fd", "on");  //override existing default values
-  multiParts[4] = new StringPart("ak", "on");  //Allow reserved keywords
-  multiParts[5] = new StringPart("id", "on");  //Import i18n  data (insert & update)
-  multiParts[6] = new StringPart("md", "on");  //import solution meta data
-  multiParts[7] = new StringPart("solution_password", ""); //solution pwd empty
-  multiParts[8] = new StringPart("submit", "Import!");  //submit button
-   
-  if (allowDBModelChanges) {
-  	multiParts[10] = new StringPart("dm", "on");  //allow data model database changes
-  }
-  
-  post.addParameter("solution_password", "");
-  post.addParameter("submit", "Import!");
-  multiParts[9] = new FilePart("if", "if", input, "application/octet-stream", "charset=UTF-8");
-
-  post.setRequestEntity(
-      new MultipartRequestEntity(multiParts, post.getParams())
-      );
-  
-  try {
-    int result = client.executeMethod(post)
-    println "Return code: ${result}"
-    string body = post.getResponseBodyAsString();
-    println body;
-    if (body.indexOf("[error]") > -1) 
-        currentBuild.result = 'FAILURE'
-  } finally {
-    	post.releaseConnection()
-  }
-
-}
-
-
-
-
-def notifyBuild(String buildStatus = 'STARTED') {
-  // build status of null means successful
-  buildStatus =  buildStatus ?: 'SUCCESSFUL'
-
-  // Default values
-  def colorName = 'RED'
-  def colorCode = '#FF0000'
-  def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
-  def summary = "${subject} (${env.BUILD_URL})"
-  def details = """<p>STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
-    <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>"""
-
-  // Override default values based on build status
-  if (buildStatus == 'STARTED') {
-    color = 'YELLOW'
-    colorCode = '#FFFF00'
-  } else if (buildStatus == 'SUCCESSFUL') {
-    color = 'GREEN'
-    colorCode = '#00FF00'
-  } else {
-    color = 'RED'
-    colorCode = '#FF0000'
-  }
-
-  // Send notifications
-  //slackSend (color: colorCode, message: summary)
 }
 
 
