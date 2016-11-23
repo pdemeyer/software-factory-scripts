@@ -8,7 +8,7 @@
 
 def importSolutions(String solutionFilePath, String serverUrl, boolean allowDBModelChanges = false) {
 
-  echo "importing solution " + "${solutionFilePath} + " to: " + "${serverUrl}" + " allowing model changes: " + "${allowDBModelChanges}"
+  echo "importing solution " + "${solutionFilePath} + " to " + "${serverUrl}" + " allowing model changes: " + "${allowDBModelChanges}"
         
   def server = "server"
   def importTargetUrl = "http://${serverUrl}/servoy-admin/solutions/import"
