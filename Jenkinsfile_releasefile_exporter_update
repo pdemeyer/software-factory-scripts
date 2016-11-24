@@ -76,7 +76,7 @@ node {
     }
     
     stage('Export Solution files') {
-       solutionexporter.exportSolutions(${equinoxJar}, ${servoyAppServerHome}, ${solutionsToExport}, ${exportOutputFolder}, ${exportServoyProperties)
+       solutionexporter.exportSolutions(${equinoxJar}, ${servoyAppServerHome}, ${solutionsToExport}, ${exportOutputFolder}, ${exportServoyProperties})
    }
    
    stage('Deploy To Release file exporter') {
