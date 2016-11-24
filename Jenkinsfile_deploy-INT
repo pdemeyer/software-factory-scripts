@@ -31,8 +31,8 @@ node {
    def publishFilesPattern = '*.servoy'
    def releaseFilesPattern = "*.xml"
    
-   def releaseFileShare = "\\\\GLOBIS-INT\\ReleaseFiles"
-   def releaseFileShareEscaped = "\\\\\\\\GLOBIS-INT\\\\ReleaseFiles"
+   def releaseFileShare = "\\\\192.168.73.159\\ReleaseFiles"
+   def releaseFileShareEscaped = "\\\\\\\\192.168.73.159\\\\ReleaseFiles"
    
    def targetServerUrl = "192.168.73.159:8090"
    
