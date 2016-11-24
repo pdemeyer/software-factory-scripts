@@ -1,4 +1,8 @@
+import org.apache.commons.httpclient.*
 
+import org.apache.commons.httpclient.auth.*
+import org.apache.commons.httpclient.methods.*
+import org.apache.commons.httpclient.methods.multipart.*
 
 
 /**
@@ -79,4 +83,6 @@ def importSolutions(String solutionFilePath, String serverUrl, boolean allowDBMo
   }
 
 }
+
+return this
 
