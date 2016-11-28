@@ -1,0 +1,171 @@
+
+
+
+node {
+    
+	def rootDir = pwd()
+    def slacknotifier = load "${rootDir}@script/lib/notification_slack.groovy"
+    def solutionimporter = load "${rootDir}@script/lib/solution_import.groovy"
+    
+    
+   def servoyHome = "C:/Servoy"
+   def servoyDeveloperHome = "${servoyHome}/developer"
+   def servoyAppServerHome = "${servoyHome}/application_server"
+   def equinoxJar = "${servoyDeveloperHome}/plugins/org.eclipse.equinox.launcher_1.3.0.v20130327-1440.jar"
+   
+   def workspaceSolutionsDir = "globis_online_repo"
+   def servoyPropertiesDir = "${workspaceSolutionsDir}/build_files/servoy_properties_file"
+   
+   def exportServoyProperties = "${servoyPropertiesDir}/exporter_servoy.properties"
+   
+   def exportOutputFolder = "deployments"
+   
+   def solutionsToExport = "globis_deployment,globis_deployment_customers,globis_framework,globis_webservice,globis_webservice_system"
+   
+   def versionInfoFilePath = "${workspaceSolutionsDir}/build_files/VersionInfo.txt"
+   
+   def versionEnvironmentPrefix = "INT-"
+   def versionNumber = ""
+   def versionTag = "10.3.12-DEBUG"
+   def versionComment = "test comment"
+   
+   def sourcesBranchName = "*/10.3.11/10.3.11"
+   //def sourcesBranchName = "*/master"
+   def artefactsBranchName = "master"
+   def artefactsBranchName = "10.3.11"
+   def publishFilesPattern = '*.servoy'
+   def releaseFilesPattern = "*.xml"
+   
+   def releaseFileExporterUrl = "192.168.73.235:8090"
+   def metadataSolutionFile = "globis_metadata.servoy"
+   def webserviceSolutionFile = "globis_webservice.servoy"
+   def webserviceSystemSolutionFile = "globis_webservice_system.servoy"
+   
+   def releaseFileShare = "\\\\SRV16001\\ReleaseFiles"
+   def releaseFileShareEscaped = "\\\\\\\\SRV16001\\\\ReleaseFiles"
+   
+   try {
+   stage('settings log') {
+	slacknotifier.notifyBuild('STARTED')
+	
+    echo "${servoyHome}"
+    echo "${servoyDeveloperHome}"
+    echo "${workspaceSolutionsDir}"
+    echo "${servoyPropertiesDir}"
+    echo "${exportServoyProperties}"
+    
+   }
+
+   stage('Get Globis source code from GIT') { // for display purposes
+      checkout([$class: 'GitSCM', 
+                branches: [[name: "${sourcesBranchName}"]], 
+                doGenerateSubmoduleConfigurations: false, 
+                extensions: [[$class: 'RelativeTargetDirectory', 
+                relativeTargetDir: 'globis_online_repo']], 
+                submoduleCfg: [], 
+                userRemoteConfigs: [[url: 'git@github_jenkins:globisnv/globis-online.git']]])
+   }
+   
+    stage('Sync artifacts GIT') { // for display purposes
+          checkout([$class: 'GitSCM', 
+                    branches: [[name: "${artefactsBranchName}"]], 
+                    doGenerateSubmoduleConfigurations: false, 
+                    extensions: [[$class: 'RelativeTargetDirectory', 
+                    relativeTargetDir: "${exportOutputFolder}"]], 
+                    submoduleCfg: [], 
+                    userRemoteConfigs: [[url: 'git@github_jenkins:globisnv/globis-artifacts.git']]])
+    }
+    
+    stage('Read configuration') {
+        def d = [test: 'Default', something: 'Default', other: 'Default']
+        def props = readProperties defaults: d, file: "${versionInfoFilePath}", text: 'other=Override'
+
+        versionNumber = props["GLOBIS_VERSION_NUMBER"]
+    }
+       
+    stage('Define Version, Tag, Commit message'){
+        def buildNumber = VersionNumber projectStartDate: '1970-01-01', versionNumberString: '${BUILD_ID}', versionPrefix: ''
+        versionTag = versionEnvironmentPrefix + versionNumber + "-" + buildNumber
+        
+        currentBuild.description = versionTag
+    }
+    
+    stage('Export Solution files') {
+       
+       def exportCommand = 'java '
+       exportCommand += "-cp ${equinoxJar}"
+       exportCommand += " org.eclipse.equinox.launcher.Main "
+       exportCommand += " -Xms256m "
+       exportCommand += " -Xmx2048m "
+       exportCommand += " -XX:MaxPermSize=512M "
+       exportCommand += " -Dservoy.application_server.dir=${servoyAppServerHome}"
+       exportCommand += " -Dosgi.configuration.cascaded=false "
+       exportCommand += " -data globis_online_repo"
+       exportCommand += " -application com.servoy.eclipse.exporter.solution.application"
+       exportCommand += " -s ${solutionsToExport} "
+       exportCommand += " -o ${exportOutputFolder}"
+       exportCommand += " -as ${servoyAppServerHome}"
+       exportCommand += " -p ${exportServoyProperties}"
+       exportCommand += " -ie "
+       exportCommand += " -dbd "
+       exportCommand += " -dbi "
+       exportCommand += " -md ws "
+       exportCommand += " -i18n "
+       exportCommand += " -tables "
+       exportCommand += " -modules "
+       
+       echo exportCommand
+       
+       def out_str =  bat returnStdout: true, script: exportCommand
+    
+        echo out_str     
+   }
+   
+   /*
+   stage('Export Release files') {
+       httpRequest acceptType: "APPLICATION_JSON", 
+            consoleLogResponseBody: true, 
+            contentType: "APPLICATION_JSON", 
+            httpMode: 'POST', 
+            requestBody: "{server_path: \"${releaseFileShareEscaped}\", owner_ids: [
+            \"88888888-8888-8888-8888-888888888888\"
+            ], type:\"D\"}", 
+            timeout: 60, 
+            url: "http://${releaseFileExporterUrl}/servoy-service/api_v1/88888888-8888-8888-8888-888888888888/admin/exportreleasefiles", 
+            validResponseContent: '{"messages":[]}'
+   }
+    
+    stage('Copy over release files to artifacts folder') {
+        bat script: "xcopy /Y /s \"${releaseFileShare}\\${releaseFilesPattern}\" \"${exportOutputFolder}\"" 
+    }
+   */
+   
+   
+   stage('Commit & push to Artefacts GIT') {
+       
+        //bat script: "git -C ${exportOutputFolder} config --global user.name globis-jenkins"
+        //bat script: "git -C ${exportOutputFolder} config --global user.email pdemeyer@outlook"
+        
+        /* we have now a detached head, and fix this by doing a checkout again */
+        bat script: "git -C ${exportOutputFolder} checkout -B \"${artefactsBranchName}\""
+        bat script: "git -C ${exportOutputFolder} add ${publishFilesPattern}"
+      //  bat script: "git -C ${exportOutputFolder} add ${releaseFilesPattern}"
+        bat script: "git -C ${exportOutputFolder} commit --all -m \"${versionTag}\" --author=\"globis-jenkins <pdemeyer@outlook.be>\""
+        bat script: "git -C ${exportOutputFolder} tag -a \"${versionTag}\" -m \"${versionComment}\""
+        bat script: "git -C ${exportOutputFolder} push --all"
+        bat script: "git -C ${exportOutputFolder} push --tags"
+       
+   }
+   
+   
+   } catch (e) {
+    // If there was an exception thrown, the build failed
+    currentBuild.result = "FAILED"
+    throw e
+  } finally {
+    // Success or failure, always send notifications
+    slacknotifier.notifyBuild(currentBuild.result)
+  }
+}
+
+
