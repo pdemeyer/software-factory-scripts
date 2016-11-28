@@ -64,9 +64,11 @@ node {
                     userRemoteConfigs: [[url: 'git@github_jenkins:globisnv/globis-artifacts.git']]])
     }
     
+    /*
     stage('Copy over release files to import folder') {
         bat script: "xcopy /s /Y \"${exportOutputFolder}\\${releaseFilesPattern}\" \"${releaseFileShare}\"" 
     }
+    */
     
     /*
     stage('Deploy Webservice solutions') {
