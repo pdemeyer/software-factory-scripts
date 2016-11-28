@@ -31,7 +31,7 @@ node {
    
    def sourcesBranchName = "*/10.3.11/10.3.11"
    //def sourcesBranchName = "*/master"
-   def artefactsBranchName = "master"
+   //def artefactsBranchName = "master"
    def artefactsBranchName = "10.3.11"
    def publishFilesPattern = '*.servoy'
    def releaseFilesPattern = "*.xml"
