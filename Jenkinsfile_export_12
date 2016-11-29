@@ -24,9 +24,9 @@ node {
    
    def versionInfoFilePath = "${workspaceSolutionsDir}/build_files/VersionInfo.txt"
    
-   def versionEnvironmentPrefix = "INT-"
+   def versionEnvironmentPrefix = "TST-"
    def versionNumber = ""
-   def versionTag = "10.3.12-DEBUG"
+   def versionTag = "10.3.12-TST"
    def versionComment = "test comment"
    
    def sourcesBranchName = "*/10.3.12/10.3.12"
