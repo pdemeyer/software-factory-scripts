@@ -78,8 +78,10 @@ def importSolutions(String solutionFilePath, String serverUrl, boolean allowDBMo
     println "Return code: ${result}"
     string body = post.getResponseBodyAsString();
     println body;
-    if (body.indexOf("[error]") > -1) 
+    if (body.indexOf("[error]") > -1) {
         currentBuild.result = 'FAILURE'
+        throw new Exception()
+        }
   } finally {
     	post.releaseConnection()
   }

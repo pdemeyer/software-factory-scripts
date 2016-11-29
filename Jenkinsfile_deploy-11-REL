@@ -105,7 +105,7 @@ node {
    */
       
    stage ('Import solution on server') {
-        solutionimporter.importSolutions("${exportOutputFolder}/${deploymentSolutionFile}", targetServerUrl, false)
+        //solutionimporter.importSolutions("${exportOutputFolder}/${deploymentSolutionFile}", targetServerUrl, false)
         solutionimporter.importSolutions("${exportOutputFolder}/${deploymentCustomersSolutionFile}", targetServerUrl, false)
    }
    
