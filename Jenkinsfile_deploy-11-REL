@@ -70,6 +70,13 @@ node {
     }
     */
     
+    stage('Set build description') {
+    	def out_str =  bat returnStdout: true, script: "git -C ${exportOutputFolder} log -1 --pretty=%B"
+    	echo out_str
+    	
+    	currentBuild.description = out_str
+    }
+    
     /*
     stage('Deploy Webservice solutions') {
   
