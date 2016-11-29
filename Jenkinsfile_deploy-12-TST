@@ -22,7 +22,7 @@ node {
    
    def versionInfoFilePath = "${workspaceSolutionsDir}/build_files/VersionInfo.txt"
    
-   def versionEnvironmentPrefix = "TST-
+   def versionEnvironmentPrefix = "TST-"
    def versionNumber = ""
    def versionTag = "10.3.11-TST"
    def versionComment = "test comment"
