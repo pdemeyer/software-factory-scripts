@@ -22,9 +22,9 @@ node {
    
    def versionInfoFilePath = "${workspaceSolutionsDir}/build_files/VersionInfo.txt"
    
-   def versionEnvironmentPrefix = ""
+   def versionEnvironmentPrefix = "TST-
    def versionNumber = ""
-   def versionTag = "10.3.11-REL"
+   def versionTag = "10.3.11-TST"
    def versionComment = "test comment"
    
    def artefactsBranchName = "10.3.12"
