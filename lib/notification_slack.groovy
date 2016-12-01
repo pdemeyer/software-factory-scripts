@@ -30,7 +30,7 @@ def notifyBuild(String buildStatus = 'STARTED') {
   }
 
   // Send notifications
-  //slackSend (color: colorCode, message: summary)
+  slackSend (color: colorCode, message: summary)
 }
 
 return this
