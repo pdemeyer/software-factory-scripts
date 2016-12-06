@@ -141,7 +141,7 @@ node {
             contentType: "APPLICATION_JSON", 
             httpMode: 'POST', 
             requestBody: "{server_path: \"${releaseFileShareEscaped}\", owner_ids: ${ownerIdsEscaped} }", 
-            timeout: 60, 
+            timeout: 600, 
             url: "http://${targetServerUrl}/servoy-service/api_v1/88888888-8888-8888-8888-888888888888/admin/importreleasefiles"
             //, 
             //validResponseContent: '{"messages":[]}'
