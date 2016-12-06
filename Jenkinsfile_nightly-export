@@ -47,7 +47,7 @@ node {
    def releaseFileShare = "\\\\SRV16001\\ReleaseFiles"
    def releaseFileShareEscaped = "\\\\\\\\SRV16001\\\\ReleaseFiles"
    
-   def ownerIdsEscaped = "[
+   def ownerIdsEscaped = /[
 						  \"88888888-8888-8888-8888-888888888888\" 
    						 ,\"7A075821-FB51-4182-87DA-0209F5B885FF\" 
 						 ,\"AB9FF2BD-11FD-4EBD-BF81-029B46BEBE33\" 
@@ -124,7 +124,7 @@ node {
 						 ,\"51CB683F-54FD-4E6F-A644-07CFC06FF34F\" 
 						 ,\"C8845362-17CE-4AB5-92F4-5A96EE739C39\" 
 						 ,\"3A54BC06-E247-4223-8DA3-884DBAE64567\" 
-   						 ]"
+   						 ]/
    						 
    						 /*
    						 def ownerIdsEscaped = "[
