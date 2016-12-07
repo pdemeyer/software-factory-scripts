@@ -24,11 +24,12 @@ def importSolutions(String solutionFilePath, String serverUrl, boolean allowDBMo
   def apiToken = "Pwd49lo815"
 
 // set the connection timeout value to 30 minutes (1800000 milliseconds)
-    def httpParams = new BasicHttpParams();
-    httpParams.setSoTimeout(1800000);
+//    def httpParams = new BasicHttpParams();
+//    httpParams.setSoTimeout(1800000);
  //   client = new DefaultHttpClient(httpParams);
 
-  def client = new HttpClient(httpParams)
+ // def client = new HttpClient(httpParams)
+  def client = new HttpClient()
   client.state.setCredentials(
     AuthScope.ANY,
     new UsernamePasswordCredentials( username, apiToken )
