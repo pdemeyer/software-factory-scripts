@@ -117,10 +117,13 @@ node {
                     userRemoteConfigs: [[url: 'git@github_jenkins:globisnv/globis-artifacts.git']]])
     }
     
+    /*
     stage('Copy over release files to import folder') {
         bat script: "xcopy /s /Y \"${exportOutputFolder}\\${releaseFilesPattern}\" \"${releaseFileShare}\"" 
     }
+    */
     
+    /*
     stage('Deploy Webservice solutions') {
   
    		try {
@@ -138,11 +141,13 @@ node {
     		throw e
 		} 
    }
+   */
    
-   
+   /*
 	stage('Restart Servoy') {
 		servoyUtils.restartServer(targetServerUrl)
 	}
+	*/
     
     stage('Import Release files') {
        httpRequest acceptType: "APPLICATION_JSON", 
@@ -156,9 +161,11 @@ node {
             //validResponseContent: '{"messages":[]}'
    }
       
+      /*
    stage ('Import solution on server') {
         solutionimporter.importSolutions("${exportOutputFolder}/${deploymentSolutionFile}", targetServerUrl, false)
    }
+   */
 } catch (e) {
     // If there was an exception thrown, the build failed
     currentBuild.result = "FAILED"
