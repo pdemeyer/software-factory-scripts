@@ -12,12 +12,12 @@ import org.apache.commons.httpclient.methods.multipart.*
   */
 
 
-def importSolutions(String solutionFilePath, String serverUrl, boolean allowDBModelChanges = false) {
+def importSolutions(String solutionFilePath, String serverBaseUrl, boolean allowDBModelChanges = false) {
 
-  echo "importing solution ${solutionFilePath} - to ${serverUrl} - allowing model changes ${allowDBModelChanges}"
+  echo "importing solution ${solutionFilePath} - to ${serverBaseUrl} - allowing model changes ${allowDBModelChanges}"
         
   def server = "server"
-  def importTargetUrl = "http://${serverUrl}/servoy-admin/solutions/import"
+  def importTargetUrl = "http://${serverBaseUrl}/servoy-admin/solutions/import"
   def projectName = "INT"
 
   def username = "globisadmin"
