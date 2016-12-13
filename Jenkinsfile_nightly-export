@@ -262,11 +262,11 @@ node {
 */
     
    }
-   /*
+   
    stage('Export Release files') {
    
-   		servoyUtils.exportReleaseFiles(releaseFileExporterUrl, releaseFileShareEscaped, ownerIdsEscaped)
-   */
+   //		servoyUtils.exportReleaseFiles(releaseFileExporterUrl, releaseFileShareEscaped, ownerIdsEscaped)
+   
    /*
        httpRequest acceptType: "APPLICATION_JSON", 
             consoleLogResponseBody: true, 
@@ -278,11 +278,11 @@ node {
             validResponseContent: '{"messages":[]}'
     */
    }
-    /*
+    
     stage('Copy over release files to artifacts folder') {
-        bat script: "xcopy /Y /s \"${releaseFileShare}\\${releaseFilesPattern}\" \"${exportOutputFolder}\"" 
+    //    bat script: "xcopy /Y /s \"${releaseFileShare}\\${releaseFilesPattern}\" \"${exportOutputFolder}\"" 
     }
-    */
+    
    
    
    
