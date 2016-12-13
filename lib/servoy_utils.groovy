@@ -39,5 +39,51 @@ def restartServer(String serverBaseUrl) {
 
 }
 
+
+def truncateRepositoryDb(String serverBaseUrl) {
+
+}
+
+def exportReleaseFiles(String releaseFileExporterUrl, String releaseFileShareEscaped, String ownerIdsEscaped) {
+ httpRequest acceptType: "APPLICATION_JSON", 
+            consoleLogResponseBody: true, 
+            contentType: "APPLICATION_JSON", 
+            httpMode: 'POST', 
+            requestBody: "{server_path: \"${releaseFileShareEscaped}\", owner_ids: ${ownerIdsEscaped}, type:\"D\"}", 
+            timeout: 600, 
+            url: "http://${releaseFileExporterUrl}/servoy-service/api_v1/88888888-8888-8888-8888-888888888888/admin/exportreleasefiles", 
+            validResponseContent: '{"messages":[]}'
+}
+
+def exportSolutions(string equinoxJar, String solutionsToExport, String exportOutputFolder, String servoyAppServerHome, String exportServoyProperties ) {
+
+       def exportCommand = 'java '
+       exportCommand += "-cp ${equinoxJar}"
+       exportCommand += " org.eclipse.equinox.launcher.Main "
+       exportCommand += " -Xms256m "
+       exportCommand += " -Xmx2048m "
+       exportCommand += " -XX:MaxPermSize=512M "
+       exportCommand += " -Dservoy.application_server.dir=${servoyAppServerHome}"
+       exportCommand += " -Dosgi.configuration.cascaded=false "
+       exportCommand += " -data globis_online_repo"
+       exportCommand += " -application com.servoy.eclipse.exporter.solution.application"
+       exportCommand += " -s ${solutionsToExport} "
+       exportCommand += " -o ${exportOutputFolder}"
+       exportCommand += " -as ${servoyAppServerHome}"
+       exportCommand += " -p ${exportServoyProperties}"
+       exportCommand += " -ie "
+       exportCommand += " -dbd "
+       exportCommand += " -dbi "
+       exportCommand += " -md ws "
+       exportCommand += " -i18n "
+       exportCommand += " -tables "
+       exportCommand += " -modules "
+       
+       echo exportCommand
+       def out_str =  bat returnStdout: true, script: exportCommand
+       echo out_str  
+}
+
+
 return this
 

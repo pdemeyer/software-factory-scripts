@@ -10,6 +10,7 @@ node {
 	def rootDir = pwd()
     def slacknotifier = load "${rootDir}@script/lib/notification_slack.groovy"
     def solutionimporter = load "${rootDir}@script/lib/solution_import.groovy"
+    def servoyUtils = load "${rootDir}@script/lib/servoy_utils.groovy"
     
     
    def servoyHome = "C:/Servoy"
@@ -193,8 +194,6 @@ node {
    }
 
    stage('Get Globis source code from GIT') { // for display purposes
-      // Get some code from a GitHub repository
-      //git url:'git@github_jenkins:globisnv/globis-online.git', branch:'*/10.3.12/10.3.12'
       checkout([$class: 'GitSCM', 
                 branches: [[name: "${sourcesBranchName}"]], 
                 doGenerateSubmoduleConfigurations: false, 
@@ -205,8 +204,6 @@ node {
    }
    
     stage('Sync artifacts GIT') { // for display purposes
-          // Get some code from a GitHub repository
-          //git url:'git@github_jenkins:globisnv/globis-artifacts.git', branch:'*/10.3.12'
           checkout([$class: 'GitSCM', 
                     branches: [[name: "${artefactsBranchName}"]], 
                     doGenerateSubmoduleConfigurations: false, 
@@ -232,6 +229,9 @@ node {
     
     stage('Export Solution files') {
        
+       servoyUtils.exportSolutions(equinoxJar, solutionsToExport, exportOutputFolder, servoyAppServerHome, exportServoyProperties ) {
+
+/*       
        def exportCommand = 'java '
        exportCommand += "-cp ${equinoxJar}"
        exportCommand += " org.eclipse.equinox.launcher.Main "
@@ -258,10 +258,16 @@ node {
        
        def out_str =  bat returnStdout: true, script: exportCommand
     
-        echo out_str     
+       echo out_str 
+*/
+    
    }
-   
+   /*
    stage('Export Release files') {
+   
+   		servoyUtils.exportReleaseFiles(releaseFileExporterUrl, releaseFileShareEscaped, ownerIdsEscaped)
+   */
+   /*
        httpRequest acceptType: "APPLICATION_JSON", 
             consoleLogResponseBody: true, 
             contentType: "APPLICATION_JSON", 
@@ -270,29 +276,29 @@ node {
             timeout: 600, 
             url: "http://${releaseFileExporterUrl}/servoy-service/api_v1/88888888-8888-8888-8888-888888888888/admin/exportreleasefiles", 
             validResponseContent: '{"messages":[]}'
+    */
    }
-    
+    /*
     stage('Copy over release files to artifacts folder') {
         bat script: "xcopy /Y /s \"${releaseFileShare}\\${releaseFilesPattern}\" \"${exportOutputFolder}\"" 
     }
+    */
    
    
    
    stage('Commit & push to Artefacts GIT') {
-       
-        //bat script: "git -C ${exportOutputFolder} config --global user.name globis-jenkins"
-        //bat script: "git -C ${exportOutputFolder} config --global user.email pdemeyer@outlook"
         
         /* we have now a detached head, and fix this by doing a checkout again */
         bat script: "git -C ${exportOutputFolder} checkout -B \"${artefactsBranchName}\""
         bat script: "git -C ${exportOutputFolder} add ${publishFilesPattern}"
-        bat script: "git -C ${exportOutputFolder} add ${releaseFilesPattern}"
+    //    bat script: "git -C ${exportOutputFolder} add ${releaseFilesPattern}"
         bat script: "git -C ${exportOutputFolder} commit --all -m \"${versionTag}\" --author=\"globis-jenkins <pdemeyer@outlook.be>\""
         bat script: "git -C ${exportOutputFolder} tag -a \"${versionTag}\" -m \"${versionComment}\""
         bat script: "git -C ${exportOutputFolder} push --all"
         bat script: "git -C ${exportOutputFolder} push --tags"
        
    }
+   
    
    
    } catch (e) {
