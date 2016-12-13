@@ -229,7 +229,7 @@ node {
     
     stage('Export Solution files') {
        
-       servoyUtils.exportSolutions(equinoxJar, solutionsToExport, exportOutputFolder, servoyAppServerHome, exportServoyProperties ) {
+       servoyUtils.exportSolutions(equinoxJar, solutionsToExport, exportOutputFolder, servoyAppServerHome, exportServoyProperties )
 
 /*       
        def exportCommand = 'java '
@@ -277,6 +277,7 @@ node {
             url: "http://${releaseFileExporterUrl}/servoy-service/api_v1/88888888-8888-8888-8888-888888888888/admin/exportreleasefiles", 
             validResponseContent: '{"messages":[]}'
     */
+    
    }
     
     stage('Copy over release files to artifacts folder') {
