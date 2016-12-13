@@ -55,7 +55,7 @@ def exportReleaseFiles(String releaseFileExporterUrl, String releaseFileShareEsc
             validResponseContent: '{"messages":[]}'
 }
 
-def exportSolutions(string equinoxJar, String solutionsToExport, String exportOutputFolder, String servoyAppServerHome, String exportServoyProperties ) {
+def exportSolutions(String equinoxJar, String solutionsToExport, String exportOutputFolder, String servoyAppServerHome, String exportServoyProperties ) {
 
        def exportCommand = 'java '
        exportCommand += "-cp ${equinoxJar}"
@@ -83,6 +83,9 @@ def exportSolutions(string equinoxJar, String solutionsToExport, String exportOu
        def out_str =  bat returnStdout: true, script: exportCommand
        echo out_str  
 }
+
+
+def getServoyBearerToken
 
 
 return this
