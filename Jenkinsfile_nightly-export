@@ -25,7 +25,7 @@ node {
    
    def exportOutputFolder = "deployments"
    
-   def solutionsToExport = "globis_deployment,globis_deployment_customers,globis_framework,globis_webservice,globis_webservice_system"
+   def solutionsToExport = "globis_deployment,globis_deployment_customers,globis_framework,globis_webservice,globis_webservice_system,globis_webservice_metadata"
    
    def versionInfoFilePath = "${workspaceSolutionsDir}/build_files/VersionInfo.txt"
    
