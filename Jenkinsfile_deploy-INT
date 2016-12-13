@@ -44,6 +44,7 @@ node {
       
    def ownerIdsEscaped = /[
 						 "88888888-8888-8888-8888-888888888888"
+						,"987C0200-C534-42CF-869B-329137B15750"
    						 ]/
    						 
    						 /*
@@ -127,6 +128,7 @@ node {
 		servoyUtils.truncateRepositoryDb(targetServerUrl)
 	}
    
+   
 	stage('Restart Servoy') {
 		servoyUtils.restartServer(targetServerUrl)
 	}
@@ -178,11 +180,19 @@ node {
             //validResponseContent: '{"messages":[]}'
       */
    }
+   
+	stage('Restart Servoy') {
+		servoyUtils.restartServer(targetServerUrl)
+	}
       
       
    stage ('Import solution on server') {
         solutionimporter.importSolutions("${exportOutputFolder}/${deploymentSolutionFile}", targetServerUrl, false)
    }
+   
+	stage('Restart Servoy') {
+		servoyUtils.restartServer(targetServerUrl)
+	}
    
 } catch (e) {
     // If there was an exception thrown, the build failed
