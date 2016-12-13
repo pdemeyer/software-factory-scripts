@@ -119,7 +119,19 @@ node {
                     relativeTargetDir: "${exportOutputFolder}"]], 
                     submoduleCfg: [], 
                     userRemoteConfigs: [[url: 'git@github_jenkins:globisnv/globis-artifacts.git']]])
-    }
+    }	
+    
+    
+   
+	stage('Truncate Repository') {
+		servoyUtils.truncateRepositoryDb(targetServerUrl)
+	}
+   
+	stage('Restart Servoy') {
+		servoyUtils.restartServer(targetServerUrl)
+	}
+   
+   
     
     
     stage('Copy over release files to import folder') {

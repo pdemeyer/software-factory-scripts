@@ -41,7 +41,15 @@ def restartServer(String serverBaseUrl) {
 
 
 def truncateRepositoryDb(String serverBaseUrl) {
-
+	
+	httpRequest acceptType: "APPLICATION_JSON", 
+            consoleLogResponseBody: true, 
+            contentType: "APPLICATION_JSON", 
+            httpMode: 'POST', 
+            requestBody: "{ data:\"\"}", 
+            timeout: 60, 
+            url: "http://${serverBaseUrl}/servoy-service/api_v1/88888888-8888-8888-8888-888888888888/admin/trunc_repositorydb"
+	
 }
 
 def exportReleaseFiles(String releaseFileExporterUrl, String releaseFileShareEscaped, String ownerIdsEscaped) {
