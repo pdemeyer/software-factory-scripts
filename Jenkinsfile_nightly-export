@@ -236,17 +236,6 @@ node {
    stage('Export Release files') {
    
    		servoyUtils.exportReleaseFiles(releaseFileExporterUrl, releaseFileShareEscaped, ownerIdsEscaped)
-   
-   /*
-       httpRequest acceptType: "APPLICATION_JSON", 
-            consoleLogResponseBody: true, 
-            contentType: "APPLICATION_JSON", 
-            httpMode: 'POST', 
-            requestBody: "{server_path: \"${releaseFileShareEscaped}\", owner_ids: ${ownerIdsEscaped}, type:\"D\"}", 
-            timeout: 600, 
-            url: "http://${releaseFileExporterUrl}/servoy-service/api_v1/88888888-8888-8888-8888-888888888888/admin/exportreleasefiles", 
-            validResponseContent: '{"messages":[]}'
-    */
     
    }
     

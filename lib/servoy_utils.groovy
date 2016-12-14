@@ -59,7 +59,7 @@ def exportReleaseFiles(String releaseFileExporterUrl, String releaseFileShareEsc
             httpMode: 'POST', 
             requestBody: "{server_path: \"${releaseFileShareEscaped}\", owner_ids: ${ownerIdsEscaped}, type:\"D\"}", 
             timeout: 600, 
-            url: "http://${releaseFileExporterUrl}/servoy-service/api_v1/88888888-8888-8888-8888-888888888888/admin/exportreleasefiles", 
+            url: "http://${releaseFileExporterUrl}/servoy-service/api_v1/88888888-8888-8888-8888-888888888888/admin_meta/exportreleasefiles", 
             validResponseContent: '{"messages":[]}'
 }
 
@@ -92,8 +92,6 @@ def exportSolutions(String equinoxJar, String solutionsToExport, String exportOu
        echo out_str  
 }
 
-
-def getServoyBearerToken
 
 
 return this
