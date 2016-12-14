@@ -171,25 +171,31 @@ D4609E70-CF43-4955-BA40-974FD7052608	verdupak
                     userRemoteConfigs: [[url: 'git@github_jenkins:globisnv/globis-artifacts.git']]])
     }	
     
-    
+    stage('Import webservice for truncate') {
+   		try {
+        	solutionimporter.importSolutions("${exportOutputFolder}/${webserviceSystemSolutionFile}", targetServerUrl, true)
+		} catch (e) {
+    		// If there was an exception thrown, the build failed
+    		currentBuild.result = "FAILED"
+    		throw e
+		} 
+   }
    
+	stage('Restart Servoy -1') {
+		servoyUtils.restartServer(targetServerUrl)
+	}
+    
 	stage('Truncate Repository') {
 		servoyUtils.truncateRepositoryDb(targetServerUrl)
 	}
    
-   
-	stage('Restart Servoy') {
+	stage('Restart Servoy - 2') {
 		servoyUtils.restartServer(targetServerUrl)
 	}
    
-   
-    
-    
     stage('Copy over release files to import folder') {
         bat script: "xcopy /s /Y \"${exportOutputFolder}\\${releaseFilesPattern}\" \"${releaseFileShare}\"" 
     }
-    
-    
     
     stage('Deploy Webservice solutions') {
   
@@ -209,13 +215,10 @@ D4609E70-CF43-4955-BA40-974FD7052608	verdupak
 		} 
    }
    
-   
-   
-	stage('Restart Servoy') {
+	stage('Restart Servoy - 3') {
 		servoyUtils.restartServer(targetServerUrl)
 	}
 	
-    
     stage('Import Release files') {
       
        httpRequest acceptType: "APPLICATION_JSON", 
@@ -227,10 +230,9 @@ D4609E70-CF43-4955-BA40-974FD7052608	verdupak
             url: "http://${targetServerUrl}/servoy-service/api_v1/88888888-8888-8888-8888-888888888888/admin/importreleasefiles"
             //, 
             //validResponseContent: '{"messages":[]}'
-      
    }
    
-	stage('Restart Servoy') {
+	stage('Restart Servoy - 4') {
 		servoyUtils.restartServer(targetServerUrl)
 	}
       
@@ -239,7 +241,7 @@ D4609E70-CF43-4955-BA40-974FD7052608	verdupak
         solutionimporter.importSolutions("${exportOutputFolder}/${deploymentSolutionFile}", targetServerUrl, false)
    }
    
-	stage('Restart Servoy') {
+	stage('Restart Servoy - 5') {
 		servoyUtils.restartServer(targetServerUrl)
 	}
    
