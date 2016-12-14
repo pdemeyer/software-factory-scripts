@@ -113,7 +113,7 @@ node {
    }
    
 	stage('Restart Servoy') {
-		servoyUtils.restartServer(targetServerUrl)
+		servoyUtils.restartServer(releaseFileExporterUrl)
 	}
    
    
