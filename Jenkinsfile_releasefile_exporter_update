@@ -5,6 +5,7 @@ node {
     def slacknotifier = load "${rootDir}@script/lib/notification_slack.groovy"
     def solutionimporter = load "${rootDir}@script/lib/solution_import.groovy"
     def solutionexporter = load "${rootDir}@script/lib/solution_export.groovy"
+    def servoyUtils = load "${rootDir}@script/lib/servoy_utils.groovy"
     
     
    def servoyHome = "C:/Servoy"
@@ -19,7 +20,7 @@ node {
    
    def exportOutputFolder = "deployments"
    
-   def solutionsToExport = "globis_deployment,globis_framework,globis_metadata,globis_webservice,globis_webservice_system"
+   def solutionsToExport = "globis_metadata,globis_webservice,globis_webservice_system,globis_webservice_metadata"
    
    def versionInfoFilePath = "${workspaceSolutionsDir}/build_files/VersionInfo.txt"
    
@@ -37,6 +38,7 @@ node {
    def metadataSolutionFile = "globis_metadata.servoy"
    def webserviceSolutionFile = "globis_webservice.servoy"
    def webserviceSystemSolutionFile = "globis_webservice_system.servoy"
+   def webserviceMetaDataSolutionFile = "globis_webservice_metadata.servoy"
    
    
    try {
@@ -101,7 +103,18 @@ node {
     		currentBuild.result = "FAILED"
     		throw e
 		} 
+   		try {
+        	solutionimporter.importSolutions("${exportOutputFolder}/${webserviceMetaDataSolutionFile}", releaseFileExporterUrl, true)
+		} catch (e) {
+    		// If there was an exception thrown, the build failed
+    		currentBuild.result = "FAILED"
+    		throw e
+		} 
    }
+   
+	stage('Restart Servoy') {
+		servoyUtils.restartServer(targetServerUrl)
+	}
    
    
    } catch (e) {
