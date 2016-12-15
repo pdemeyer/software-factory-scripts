@@ -33,9 +33,23 @@ def restartServer(String serverBaseUrl) {
     requestBody: 'rf=Restart+Server', 
     url: "http://${serverBaseUrl}/servoy-admin/"
 
+	def max_retries = 5
+	def is_online = false
 
-	//sleep for a minute, very easy solution as the Servoy app server is restarting
-    Thread.sleep(60000)
+	while ( max_retries > 0 && !is_online) {
+    	max_retries--
+    	
+		//sleep for a minute, very easy solution as the Servoy app server is restarting
+    	Thread.sleep(60000)
+    	
+    	def response = httpRequest consoleLogResponseBody: true, timeout: 5, url: restartTargetUrl
+
+		if (response.contains("Servoy Server Status")) {
+			is_offline = false
+		}
+	}
+	
+	return is_online
 
 }
 
