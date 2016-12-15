@@ -42,6 +42,7 @@ node {
    def webserviceSolutionFile = "globis_webservice.servoy"
    def webserviceSystemSolutionFile = "globis_webservice_system.servoy"
    def deploymentSolutionFile = "globis_deployment.servoy"
+   def deploymentCustomersSolutionFile = "globis_deployment_customers.servoy"
       
    def ownerIdsEscaped = /[
 						 "88888888-8888-8888-8888-888888888888"
