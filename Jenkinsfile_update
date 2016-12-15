@@ -51,7 +51,6 @@ node {
    }
      
     stage('Sync artifacts GIT') { // for display purposes
-          // Get some code from a GitHub repository
           checkout([$class: 'GitSCM', 
                     branches: [[name: "${artefactsBranchName}"]], 
                     doGenerateSubmoduleConfigurations: false, 
@@ -61,15 +60,14 @@ node {
                     userRemoteConfigs: [[url: 'git@github_jenkins:globisnv/globis-artifacts.git']]])
     }
     
-    /*
     stage('Set build description') {
+    /*
     	def out_str =  bat returnStdout: true, script: "git -C ${exportOutputFolder} log -1 --pretty=%B"
     	echo out_str
     	
     	currentBuild.description = out_str
+	*/
     }
-    */
-    
     
     stage('Import webservice for truncate') {
    		try {
