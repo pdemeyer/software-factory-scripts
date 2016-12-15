@@ -54,7 +54,6 @@ def restartServer(String serverBaseUrl) {
         	    [name: 'User-Agent', value: 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36'],
         	    [name: 'Content-Type', value: 'application/x-www-form-urlencoded'],
         	    [name: 'Accept', value: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'],
-        	    [name: 'Accept-Encoding', value: 'gzip, deflate'],
         	    [name: 'Accept-Language', value: 'nl-NL,nl;q=0.8,en-US;q=0.6,en;q=0.4']
         	], 
     		timeout: 5, url: restartTargetUrl
