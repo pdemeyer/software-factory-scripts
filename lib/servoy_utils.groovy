@@ -58,9 +58,11 @@ def restartServer(String serverBaseUrl) {
         	], 
     		timeout: 5, url: restartTargetUrl
 
-		if (response.contains("Servoy Server Status")) {
+
+		if (response.indexOf("Status") > -1) { 
 			is_offline = false
 		}
+		
 	}
 	
 	return is_online
