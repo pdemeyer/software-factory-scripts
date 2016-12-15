@@ -27,14 +27,11 @@ node {
    def versionTag = "10.3.11-TST"
    def versionComment = "test comment"
    
-   def artefactsBranchName = "10.3.12"
+   def artefactsBranchName = env.artefactsBranchName  //  "10.3.12"
    def publishFilesPattern = '*.servoy'
    def releaseFilesPattern = "*.xml"
    
-   def releaseFileShare = "\\\\192.168.73.50\\ReleaseFiles"
-   def releaseFileShareEscaped = "\\\\\\\\192.168.73.50\\\\ReleaseFiles"
-   
-   def targetServerUrl = "192.168.73.45:8081"
+   def targetServerUrl = env.targetServerUrl //"192.168.73.45:8081"
    
    def metadataSolutionFile = "globis_metadata.servoy"
    def webserviceSolutionFile = "globis_webservice.servoy"
@@ -65,12 +62,6 @@ node {
     }
     
     /*
-    stage('Copy over release files to import folder') {
-        bat script: "xcopy /s /Y \"${exportOutputFolder}\\${releaseFilesPattern}\" \"${releaseFileShare}\"" 
-    }
-    */
-    
-    /*
     stage('Set build description') {
     	def out_str =  bat returnStdout: true, script: "git -C ${exportOutputFolder} log -1 --pretty=%B"
     	echo out_str
@@ -78,6 +69,29 @@ node {
     	currentBuild.description = out_str
     }
     */
+    
+    
+    stage('Import webservice for truncate') {
+   		try {
+        	solutionimporter.importSolutions("${exportOutputFolder}/${webserviceSystemSolutionFile}", targetServerUrl, true)
+		} catch (e) {
+    		// If there was an exception thrown, the build failed
+    		currentBuild.result = "FAILED"
+    		throw e
+		} 
+   }
+   
+	stage('Restart Servoy -1') {
+		servoyUtils.restartServer(targetServerUrl)
+	}
+    
+	stage('Truncate Repository') {
+		servoyUtils.truncateRepositoryDb(targetServerUrl)
+	}
+   
+	stage('Restart Servoy - 2') {
+		servoyUtils.restartServer(targetServerUrl)
+	}
     
     
     stage('Deploy Webservice solutions') {
@@ -99,31 +113,16 @@ node {
    }
    
    
-	stage('Restart Servoy') {
+	stage('Restart Servoy - 3') {
 		servoyUtils.restartServer(targetServerUrl)
 	}
 	
-    
-    /*
-    stage('Import Release files') {
-       httpRequest acceptType: "APPLICATION_JSON", 
-            consoleLogResponseBody: true, 
-            contentType: "APPLICATION_JSON", 
-            httpMode: 'POST', 
-            requestBody: "{server_path: \"${releaseFileShareEscaped}\", owner_ids: [\"88888888-8888-8888-8888-888888888888\"]}", 
-            timeout: 60, 
-            url: "http://${targetServerUrl}/servoy-service/api_v1/88888888-8888-8888-8888-888888888888/admin/importreleasefiles"
-            //, 
-            //validResponseContent: '{"messages":[]}'
-   }
-   */
       
    stage ('Import solution on server') {
-        //solutionimporter.importSolutions("${exportOutputFolder}/${deploymentSolutionFile}", targetServerUrl, false)
         solutionimporter.importSolutions("${exportOutputFolder}/${deploymentCustomersSolutionFile}", targetServerUrl, false)
    }
    
-	stage('Restart Servoy') {
+	stage('Restart Servoy - 4') {
 		servoyUtils.restartServer(targetServerUrl)
 	}
    

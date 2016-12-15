@@ -25,7 +25,7 @@ node {
    
    def exportOutputFolder = "deployments"
    
-   def solutionsToExport = "globis_deployment,globis_deployment_customers,globis_framework,globis_webservice,globis_webservice_system,globis_webservice_metadata"
+   def solutionsToExport = "globis_deployment_customers,globis_framework,globis_webservice,globis_webservice_system"
    
    def versionInfoFilePath = "${workspaceSolutionsDir}/build_files/VersionInfo.txt"
    
@@ -34,21 +34,18 @@ node {
    def versionTag = "10.3.12-DEBUG"
    def versionComment = "test comment"
    
-   //def sourcesBranchName = "*/10.3.12/10.3.12"
    def sourcesBranchName = env.sourcesBranchName  //  "*/master"
    def artefactsBranchName = env.artefactsBranchName  //   "master"
    def publishFilesPattern = '*.servoy'
    def releaseFilesPattern = "*.xml"
    
-   def releaseFileExporterUrl = env.releaseFileExporterUrl  //  "192.168.73.235:8090"
    def metadataSolutionFile = "globis_metadata.servoy"
    def webserviceSolutionFile = "globis_webservice.servoy"
    def webserviceSystemSolutionFile = "globis_webservice_system.servoy"
    
-   def releaseFileShare = env.releaseFileShare  //  "\\\\SRV16001\\ReleaseFiles"
-   def releaseFileShareEscaped = env.releaseFileShareEscaped  //  "\\\\\\\\SRV16001\\\\ReleaseFiles"
-   
-   def ownerIdsEscaped = /[
+   def ownerIdsEscaped = env.ownerIdsEscaped
+   /*
+    /[
 						 "3681ABF4-698E-4098-911D-CD20748F5E82"
 						,"7A075821-FB51-4182-87DA-0209F5B885FF"
 						,"ADE2B37F-0485-4B07-8B5B-96B6294B4FDD"
@@ -98,7 +95,7 @@ node {
 						,"D4609E70-CF43-4955-BA40-974FD7052608"
 						,"62DD90D1-B31A-4B54-8219-9B39B7D43022"
    						 ]/
-   						 
+   		*/
    						 /*
    						 def ownerIdsEscaped = "[
 						  \"88888888-8888-8888-8888-888888888888\"  // Full Globis Online
@@ -233,17 +230,6 @@ node {
     
    }
    
-   stage('Export Release files') {
-   
-   		servoyUtils.exportReleaseFiles(releaseFileExporterUrl, releaseFileShareEscaped, ownerIdsEscaped)
-    
-   }
-    
-    stage('Copy over release files to artifacts folder') {
-        bat script: "xcopy /Y /s \"${releaseFileShare}\\${releaseFilesPattern}\" \"${exportOutputFolder}\"" 
-    }
-    
-   
    
    
    stage('Commit & push to Artefacts GIT') {
@@ -251,7 +237,7 @@ node {
         /* we have now a detached head, and fix this by doing a checkout again */
         bat script: "git -C ${exportOutputFolder} checkout -B \"${artefactsBranchName}\""
         bat script: "git -C ${exportOutputFolder} add ${publishFilesPattern}"
-        bat script: "git -C ${exportOutputFolder} add ${releaseFilesPattern}"
+      //  bat script: "git -C ${exportOutputFolder} add ${releaseFilesPattern}"
         bat script: "git -C ${exportOutputFolder} commit --all -m \"${versionTag}\" --author=\"globis-jenkins <pdemeyer@outlook.be>\""
         bat script: "git -C ${exportOutputFolder} tag -a \"${versionTag}\" -m \"${versionComment}\""
         bat script: "git -C ${exportOutputFolder} push --all"

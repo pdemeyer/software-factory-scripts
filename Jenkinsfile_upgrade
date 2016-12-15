@@ -235,7 +235,7 @@ D4609E70-CF43-4955-BA40-974FD7052608	verdupak
       
       
    stage ('Import solution on server') {
-        solutionimporter.importSolutions("${exportOutputFolder}/${deploymentSolutionFile}", targetServerUrl, false)
+        solutionimporter.importSolutions("${exportOutputFolder}/${deploymentCustomersSolutionFile}", targetServerUrl, false)
    }
    
 	stage('Restart Servoy - 5') {
