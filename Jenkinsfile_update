@@ -90,37 +90,12 @@ node {
 	stage('Restart Servoy - 2') {
 		servoyUtils.restartServer(targetServerUrl)
 	}
-    
-    
-    stage('Deploy Webservice solutions') {
-  
-   		try {
-        	solutionimporter.importSolutions("${exportOutputFolder}/${webserviceSolutionFile}", targetServerUrl, true)
-		} catch (e) {
-    		// If there was an exception thrown, the build failed
-    		currentBuild.result = "FAILED"
-    		throw e
-		} 
-   		try {
-        	solutionimporter.importSolutions("${exportOutputFolder}/${webserviceSystemSolutionFile}", targetServerUrl, true)
-		} catch (e) {
-    		// If there was an exception thrown, the build failed
-    		currentBuild.result = "FAILED"
-    		throw e
-		} 
-   }
-   
+      
+   	stage ('Import solution on server') {
+   	     solutionimporter.importSolutions("${exportOutputFolder}/${deploymentCustomersSolutionFile}", targetServerUrl, false)
+   	}
    
 	stage('Restart Servoy - 3') {
-		servoyUtils.restartServer(targetServerUrl)
-	}
-	
-      
-   stage ('Import solution on server') {
-        solutionimporter.importSolutions("${exportOutputFolder}/${deploymentCustomersSolutionFile}", targetServerUrl, false)
-   }
-   
-	stage('Restart Servoy - 4') {
 		servoyUtils.restartServer(targetServerUrl)
 	}
    
