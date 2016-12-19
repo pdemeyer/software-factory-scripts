@@ -80,7 +80,7 @@ def truncateRepositoryDb(String serverBaseUrl) {
 		//sleep for a minute, very easy solution as the Servoy app server is restarting
     	Thread.sleep(20000)
     	
-    	//def empty_request_body = /{ data:"" }/
+    	def empty_request_body = /{ data:"" }/
     	
     	echo "request body: ${empty_request_body}"
     	
@@ -88,7 +88,7 @@ def truncateRepositoryDb(String serverBaseUrl) {
     	        consoleLogResponseBody: true, 
     	        contentType: "APPLICATION_JSON", 
     	        httpMode: 'POST', 
-    	        requestBody: "{ data:\"\" }", 
+    	        requestBody: empty_request_body, 
     	        timeout: 60, 
     	        url: "http://${serverBaseUrl}/servoy-service/api_v1/88888888-8888-8888-8888-888888888888/admin/trunc_repositorydb",
     	        timeout: 5, validResponseCodes: '100:599'
@@ -96,6 +96,7 @@ def truncateRepositoryDb(String serverBaseUrl) {
     	if (response.getStatus() == 200) { 
 			retry = false
 		}
+	}
     	
 	
 }
