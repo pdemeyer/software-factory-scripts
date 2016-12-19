@@ -89,7 +89,6 @@ def truncateRepositoryDb(String serverBaseUrl) {
     	        contentType: "APPLICATION_JSON", 
     	        httpMode: 'POST', 
     	        requestBody: empty_request_body, 
-    	        timeout: 60, 
     	        url: "http://${serverBaseUrl}/servoy-service/api_v1/88888888-8888-8888-8888-888888888888/admin/trunc_repositorydb",
     	        timeout: 5, validResponseCodes: '100:599'
     	
