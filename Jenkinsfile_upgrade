@@ -187,6 +187,8 @@ D4609E70-CF43-4955-BA40-974FD7052608	verdupak
 	}
     
 	stage('Truncate Repository') {
+		echo 'wait 3 more minutes'
+		Thread.sleep(180000)
 		servoyUtils.truncateRepositoryDb(targetServerUrl)
 	}
    

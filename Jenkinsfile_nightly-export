@@ -11,6 +11,7 @@ node {
     def slacknotifier = load "${rootDir}@script/lib/notification_slack.groovy"
     def solutionimporter = load "${rootDir}@script/lib/solution_import.groovy"
     def servoyUtils = load "${rootDir}@script/lib/servoy_utils.groovy"
+    def gitUtils = load "${rootDir}@script/lib/git_utils.groovy"
     
     
    def servoyHome = "C:/Servoy"
@@ -47,6 +48,10 @@ node {
    
    def releaseFileShare = env.releaseFileShare  //  "\\\\SRV16001\\ReleaseFiles"
    def releaseFileShareEscaped = env.releaseFileShareEscaped  //  "\\\\\\\\SRV16001\\\\ReleaseFiles"
+   
+   def ownerIdsEscaped = env.ownerIdsEscaped 
+   
+   /*
    
    def ownerIdsEscaped = /[
 						 "3681ABF4-698E-4098-911D-CD20748F5E82"
@@ -99,6 +104,7 @@ node {
 						,"62DD90D1-B31A-4B54-8219-9B39B7D43022"
    						 ]/
    						 
+   						 */
    						 /*
    						 def ownerIdsEscaped = "[
 						  \"88888888-8888-8888-8888-888888888888\"  // Full Globis Online
@@ -248,15 +254,24 @@ node {
    
    stage('Commit & push to Artefacts GIT') {
         
+        gitUtils.checkOut(exportOutputFolder, artefactsBranchName)
+        gitUtils.addFiles(exportOutputFolder, publishFilesPattern)
+        gitUtils.addFiles(exportOutputFolder, releaseFilesPattern)
+        gitUtils.commit(exportOutputFolder, versionTag, "globis-jenkins <pdemeyer@outlook.be>")
+        gitUtils.tag(exportOutputFolder, versionTag, versionComment)
+        gitUtils.pushAll(exportOutputFolder, artefactsBranchName)
+        gitUtils.pushTags(exportOutputFolder, artefactsBranchName)
+        
         /* we have now a detached head, and fix this by doing a checkout again */
-        bat script: "git -C ${exportOutputFolder} checkout -B \"${artefactsBranchName}\""
-        bat script: "git -C ${exportOutputFolder} add ${publishFilesPattern}"
-        bat script: "git -C ${exportOutputFolder} add ${releaseFilesPattern}"
-        bat script: "git -C ${exportOutputFolder} commit --all -m \"${versionTag}\" --author=\"globis-jenkins <pdemeyer@outlook.be>\""
-        bat script: "git -C ${exportOutputFolder} tag -a \"${versionTag}\" -m \"${versionComment}\""
-        bat script: "git -C ${exportOutputFolder} push --all"
-        bat script: "git -C ${exportOutputFolder} push --tags"
-       
+        /*
+        bat returnStdout: true, script: "git -C ${exportOutputFolder} checkout -B \"${artefactsBranchName}\""
+        bat returnStdout: true, script: "git -C ${exportOutputFolder} add ${publishFilesPattern}"
+        bat returnStdout: true, script: "git -C ${exportOutputFolder} add ${releaseFilesPattern}"
+        bat returnStdout: true, script: "git -C ${exportOutputFolder} commit --all -m \"${versionTag}\" --author=\"globis-jenkins <pdemeyer@outlook.be>\""
+        bat returnStdout: true, script: "git -C ${exportOutputFolder} tag -a \"${versionTag}\" -m \"${versionComment}\""
+        bat returnStdout: true, script: "git -C ${exportOutputFolder} push --all"
+        bat returnStdout: true, script: "git -C ${exportOutputFolder} push --tags"
+        */
    }
    
    
