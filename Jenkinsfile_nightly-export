@@ -11,7 +11,7 @@ node {
     def slacknotifier = load "${rootDir}@script/lib/notification_slack.groovy"
     def solutionimporter = load "${rootDir}@script/lib/solution_import.groovy"
     def servoyUtils = load "${rootDir}@script/lib/servoy_utils.groovy"
-    def gitUtils = load "${rootDir}@script/lib/git_utils.groovy"
+    //def gitUtils = load "${rootDir}@script/lib/git_utils.groovy"
     
     
    def servoyHome = "C:/Servoy"
@@ -253,7 +253,7 @@ node {
    
    
    stage('Commit & push to Artefacts GIT') {
-        
+        /*
         gitUtils.checkOut(exportOutputFolder, artefactsBranchName)
         gitUtils.addFiles(exportOutputFolder, publishFilesPattern)
         gitUtils.addFiles(exportOutputFolder, releaseFilesPattern)
@@ -261,9 +261,9 @@ node {
         gitUtils.tag(exportOutputFolder, versionTag, versionComment)
         gitUtils.pushAll(exportOutputFolder, artefactsBranchName)
         gitUtils.pushTags(exportOutputFolder, artefactsBranchName)
-        
+        */
         /* we have now a detached head, and fix this by doing a checkout again */
-        /*
+        
         bat returnStdout: true, script: "git -C ${exportOutputFolder} checkout -B \"${artefactsBranchName}\""
         bat returnStdout: true, script: "git -C ${exportOutputFolder} add ${publishFilesPattern}"
         bat returnStdout: true, script: "git -C ${exportOutputFolder} add ${releaseFilesPattern}"
@@ -271,7 +271,7 @@ node {
         bat returnStdout: true, script: "git -C ${exportOutputFolder} tag -a \"${versionTag}\" -m \"${versionComment}\""
         bat returnStdout: true, script: "git -C ${exportOutputFolder} push --all"
         bat returnStdout: true, script: "git -C ${exportOutputFolder} push --tags"
-        */
+        
    }
    
    
