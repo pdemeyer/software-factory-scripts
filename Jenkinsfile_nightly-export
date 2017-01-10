@@ -25,6 +25,7 @@ node {
    def exportServoyProperties = "${servoyPropertiesDir}/exporter_servoy.properties"
    
    def exportOutputFolder = "deployments"
+   def sourcesFolder = "globis_online_repo"
    
    def solutionsToExport = "globis_deployment,globis_deployment_customers,globis_framework,globis_webservice,globis_webservice_system,globis_webservice_metadata"
    
@@ -203,8 +204,8 @@ node {
       checkout([$class: 'GitSCM', 
                 branches: [[name: "${sourcesBranchName}"]], 
                 doGenerateSubmoduleConfigurations: false, 
-                extensions: [[$class: 'RelativeTargetDirectory', 
-                relativeTargetDir: 'globis_online_repo']], 
+                extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: "${sourcesFolder}"],
+                			 [$class: 'CheckoutOption', timeout: 20]], 
                 submoduleCfg: [], 
                 userRemoteConfigs: [[url: 'git@github_jenkins:globisnv/globis-online.git']]])
    }
@@ -213,8 +214,8 @@ node {
           checkout([$class: 'GitSCM', 
                     branches: [[name: "${artefactsBranchName}"]], 
                     doGenerateSubmoduleConfigurations: false, 
-                    extensions: [[$class: 'RelativeTargetDirectory', 
-                    relativeTargetDir: "${exportOutputFolder}"]], 
+                    extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: "${exportOutputFolder}"],
+                			     [$class: 'CheckoutOption', timeout: 20]], 
                     submoduleCfg: [], 
                     userRemoteConfigs: [[url: 'git@github_jenkins:globisnv/globis-artifacts.git']]])
     }
@@ -264,6 +265,10 @@ node {
         */
         /* we have now a detached head, and fix this by doing a checkout again */
         
+        bat returnStdout: true, script: "git -C ${sourcesFolder} checkout -B \"${sourcesBranchName}\""
+        bat returnStdout: true, script: "git -C ${sourcesFolder} tag -a \"${versionTag}\" -m \"${versionComment}\""
+        bat returnStdout: true, script: "git -C ${sourcesFolder} push --tags"
+        
         bat returnStdout: true, script: "git -C ${exportOutputFolder} checkout -B \"${artefactsBranchName}\""
         bat returnStdout: true, script: "git -C ${exportOutputFolder} add ${publishFilesPattern}"
         bat returnStdout: true, script: "git -C ${exportOutputFolder} add ${releaseFilesPattern}"
@@ -272,6 +277,13 @@ node {
         bat returnStdout: true, script: "git -C ${exportOutputFolder} push --all"
         bat returnStdout: true, script: "git -C ${exportOutputFolder} push --tags"
         
+   }
+   
+   
+   stage('Tag sources repository') {
+        bat returnStdout: true, script: "git -C ${sourcesFolder} checkout -B \"${sourcesBranchName}\""
+        bat returnStdout: true, script: "git -C ${sourcesFolder} tag -a \"${versionTag}\" -m \"${versionComment}\""
+        bat returnStdout: true, script: "git -C ${sourcesFolder} push --tags"
    }
    
    

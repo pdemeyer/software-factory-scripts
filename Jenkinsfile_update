@@ -27,11 +27,11 @@ node {
    def versionTag = "10.3.11-TST"
    def versionComment = "test comment"
    
-   def artefactsBranchName = env.artefactsBranchName  //  "10.3.12"
+   def artefactsBranchName = env.artefactsBranchName 
    def publishFilesPattern = '*.servoy'
    def releaseFilesPattern = "*.xml"
    
-   def targetServerUrl = env.targetServerUrl //"192.168.73.45:8081"
+   def targetServerUrl = env.targetServerUrl
    
    def metadataSolutionFile = "globis_metadata.servoy"
    def webserviceSolutionFile = "globis_webservice.servoy"
