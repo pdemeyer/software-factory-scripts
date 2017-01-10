@@ -5,6 +5,7 @@ node {
 	def rootDir = pwd()
     def slacknotifier = load "${rootDir}@script/lib/notification_slack.groovy"
     def solutionimporter = load "${rootDir}@script/lib/solution_import.groovy"
+    def servoyUtils = load "${rootDir}@script/lib/servoy_utils.groovy"
 
   try {
       
