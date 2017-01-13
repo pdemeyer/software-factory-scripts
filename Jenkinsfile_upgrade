@@ -231,6 +231,8 @@ D4609E70-CF43-4955-BA40-974FD7052608	verdupak
     stage('Import Release files') {
 		echo 'wait 3 more minutes'
 		Thread.sleep(180000)
+		
+		echo ${ownerIdsEscaped}
       
        httpRequest acceptType: "APPLICATION_JSON", 
             consoleLogResponseBody: true, 
