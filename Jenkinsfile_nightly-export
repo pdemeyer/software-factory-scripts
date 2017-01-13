@@ -253,6 +253,7 @@ node {
    
    
    
+   
    stage('Commit & push to Artefacts GIT') {
         /*
         gitUtils.checkOut(exportOutputFolder, artefactsBranchName)
@@ -264,11 +265,7 @@ node {
         gitUtils.pushTags(exportOutputFolder, artefactsBranchName)
         */
         /* we have now a detached head, and fix this by doing a checkout again */
-        /*
-        bat returnStdout: true, script: "git -C ${sourcesFolder} checkout -B \"${sourcesBranchName}\""
-        bat returnStdout: true, script: "git -C ${sourcesFolder} tag -a \"${versionTag}\" -m \"${versionComment}\""
-        bat returnStdout: true, script: "git -C ${sourcesFolder} push --tags"
-        */
+        
         bat returnStdout: true, script: "git -C ${exportOutputFolder} checkout -B \"${artefactsBranchName}\""
         bat returnStdout: true, script: "git -C ${exportOutputFolder} add ${publishFilesPattern}"
         bat returnStdout: true, script: "git -C ${exportOutputFolder} add ${releaseFilesPattern}"
@@ -277,12 +274,6 @@ node {
         bat returnStdout: true, script: "git -C ${exportOutputFolder} push --all"
         bat returnStdout: true, script: "git -C ${exportOutputFolder} push --tags"
         
-   }
-   
-   stage('Tag sources repository') {
-        bat returnStdout: true, script: "git -C ${sourcesFolder} checkout -B \"${sourcesBranchName}\""
-        bat returnStdout: true, script: "git -C ${sourcesFolder} tag -a \"${versionTag}\" -m \"${versionComment}\""
-        bat returnStdout: true, script: "git -C ${sourcesFolder} push --tags"
    }
    
    
