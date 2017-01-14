@@ -25,7 +25,6 @@ node {
    def exportServoyProperties = "${servoyPropertiesDir}/exporter_servoy.properties"
    
    def exportOutputFolder = "deployments"
-   def sourcesFolder = "globis_online_repo"
    
    def solutionsToExport = "globis_deployment,globis_deployment_customers,globis_framework,globis_webservice,globis_webservice_system,globis_webservice_metadata"
    
@@ -204,8 +203,8 @@ node {
       checkout([$class: 'GitSCM', 
                 branches: [[name: "${sourcesBranchName}"]], 
                 doGenerateSubmoduleConfigurations: false, 
-                extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: "${sourcesFolder}"],
-                			 [$class: 'CheckoutOption', timeout: 20]], 
+                extensions: [[$class: 'RelativeTargetDirectory', 
+                relativeTargetDir: 'globis_online_repo']], 
                 submoduleCfg: [], 
                 userRemoteConfigs: [[url: 'git@github_jenkins:globisnv/globis-online.git']]])
    }
@@ -214,8 +213,8 @@ node {
           checkout([$class: 'GitSCM', 
                     branches: [[name: "${artefactsBranchName}"]], 
                     doGenerateSubmoduleConfigurations: false, 
-                    extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: "${exportOutputFolder}"],
-                			     [$class: 'CheckoutOption', timeout: 20]], 
+                    extensions: [[$class: 'RelativeTargetDirectory', 
+                    relativeTargetDir: "${exportOutputFolder}"]], 
                     submoduleCfg: [], 
                     userRemoteConfigs: [[url: 'git@github_jenkins:globisnv/globis-artifacts.git']]])
     }
@@ -250,7 +249,6 @@ node {
         bat script: "xcopy /Y /s \"${releaseFileShare}\\${releaseFilesPattern}\" \"${exportOutputFolder}\"" 
     }
     
-   
    
    
    
