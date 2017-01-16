@@ -240,7 +240,7 @@ D4609E70-CF43-4955-BA40-974FD7052608	verdupak
             contentType: "APPLICATION_JSON", 
             httpMode: 'POST', 
             requestBody: "{server_path: \"${releaseFileShareEscaped}\", owner_ids: ${ownerIdsEscaped} }", 
-            timeout: 600, 
+            timeout: 6000, 
             url: "http://${targetServerUrl}/servoy-service/api_v1/88888888-8888-8888-8888-888888888888/admin/importreleasefiles"
             //, 
             //validResponseContent: '{"messages":[]}'
