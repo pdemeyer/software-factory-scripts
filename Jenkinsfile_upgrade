@@ -44,6 +44,11 @@ node {
    def deploymentSolutionFile = "globis_deployment.servoy"
    def deploymentCustomersSolutionFile = "globis_deployment_customers.servoy"
       
+      
+   def ownerIdsEscaped = env.ownerIdsEscaped 
+    
+/*    
+      
    def ownerIdsEscaped = /[
 						 "88888888-8888-8888-8888-888888888888"
 						,"987C0200-C534-42CF-869B-329137B15750"
@@ -94,6 +99,10 @@ node {
 						,"D4609E70-CF43-4955-BA40-974FD7052608"
 						,"62DD90D1-B31A-4B54-8219-9B39B7D43022"
    						 ]/
+   						 
+   						 
+   						 */
+   						 
    						 
    						 /*
    						 
