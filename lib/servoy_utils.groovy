@@ -30,7 +30,7 @@ def restartServer(String serverBaseUrl) {
     requestBody: 'rf=Restart+Server', 
     url: "http://${serverBaseUrl}/servoy-admin/"
 
-	def max_retries = 5
+	def max_retries = 15 //for TST & REL, the time needed to get a server up and running is between 1 and 3 minutes normally
 	def is_online = false
 
 	while ( max_retries > 0 && !is_online) {
