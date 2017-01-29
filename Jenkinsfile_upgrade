@@ -100,9 +100,7 @@ node {
 						,"62DD90D1-B31A-4B54-8219-9B39B7D43022"
    						 ]/
    						 
-   						 
    						 */
-   						 
    						 
    						 /*
    						 
@@ -238,8 +236,6 @@ D4609E70-CF43-4955-BA40-974FD7052608	verdupak
 	}
 	
     stage('Import Release files') {
-		echo 'wait 3 more minutes'
-		Thread.sleep(180000)
       
        httpRequest acceptType: "APPLICATION_JSON", 
             consoleLogResponseBody: true, 
