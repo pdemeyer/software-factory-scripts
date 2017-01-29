@@ -90,7 +90,7 @@ node {
    
    stage('Deploy To Release file exporter') {
    		try {
-        	solutionimporter.importSolutions("${exportOutputFolder}/${metadataSolutionFile}", releaseFileExporterUrl, false)
+        	solutionimporter.importSolutions("${exportOutputFolder}/${metadataSolutionFile}", releaseFileExporterUrl, true)
 		} catch (e) {
     		// If there was an exception thrown, the build failed
     		currentBuild.result = "FAILED"
