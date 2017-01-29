@@ -9,7 +9,7 @@ def restartServer(String serverBaseUrl) {
         
   def restartTargetUrl = "http://${serverBaseUrl}/servoy-admin"
   
-  httpRequest consoleLogResponseBody: true, 
+  httpRequest consoleLogResponseBody: false, 
     customHeaders: 
         [
             [name: 'Host', value: "${serverBaseUrl}"],
@@ -37,9 +37,9 @@ def restartServer(String serverBaseUrl) {
     	max_retries--
     	
 		//sleep for a minute, very easy solution as the Servoy app server is restarting
-    	Thread.sleep(60000)
+    	Thread.sleep(20000)
     	
-    	def response = httpRequest consoleLogResponseBody: true, 
+    	def response = httpRequest consoleLogResponseBody: false, 
     		customHeaders: 
         	[
         	    [name: 'Host', value: "${serverBaseUrl}"],
