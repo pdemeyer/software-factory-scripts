@@ -81,6 +81,13 @@ node {
        solutionexporter.exportSolutions(equinoxJar, servoyAppServerHome, solutionsToExport, exportOutputFolder, exportServoyProperties)
    }
    
+	stage('Restart Servoy - 0') {
+		if (!servoyUtils.restartServer(releaseFileExporterUrl)) {
+			currentBuild.result = "FAILED"
+			throw new Exception("target server not running")
+		}
+	}
+   
    stage('Deploy To Release file exporter') {
    		try {
         	solutionimporter.importSolutions("${exportOutputFolder}/${metadataSolutionFile}", releaseFileExporterUrl, false)
@@ -112,8 +119,11 @@ node {
 		} 
    }
    
-	stage('Restart Servoy') {
-		servoyUtils.restartServer(releaseFileExporterUrl)
+	stage('Restart Servoy - 1') {
+		if (!servoyUtils.restartServer(releaseFileExporterUrl)) {
+			currentBuild.result = "FAILED"
+			throw new Exception("target server not running")
+		}
 	}
    
    
