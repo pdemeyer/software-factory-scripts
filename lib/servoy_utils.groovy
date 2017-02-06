@@ -106,7 +106,7 @@ def exportReleaseFiles(String releaseFileExporterUrl, String releaseFileShareEsc
             contentType: "APPLICATION_JSON", 
             httpMode: 'POST', 
             requestBody: "{server_path: \"${releaseFileShareEscaped}\", owner_ids: ${ownerIdsEscaped}, type:\"D\"}", 
-            timeout: 600, 
+            timeout: 6000, 
             url: "http://${releaseFileExporterUrl}/servoy-service/api_v1/88888888-8888-8888-8888-888888888888/admin_meta/exportreleasefiles", 
             validResponseContent: '{"messages":[]}'
 }
