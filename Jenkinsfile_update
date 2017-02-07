@@ -6,6 +6,7 @@ node {
     def slacknotifier = load "${rootDir}@script/lib/notification_slack.groovy"
     def solutionimporter = load "${rootDir}@script/lib/solution_import.groovy"
     def servoyUtils = load "${rootDir}@script/lib/servoy_utils.groovy"
+    def gitUtils = load "${rootDir}@script/lib/git_utils.groovy"
 
   try {
       
@@ -62,12 +63,12 @@ node {
     }
     
     stage('Set build description') {
-    /*
-    	def out_str =  bat returnStdout: true, script: "git -C ${exportOutputFolder} log -1 --pretty=%B"
+    
+    	def out_str = gitUtils.getLastCommitMessage(exportOutputFolder)
     	echo out_str
     	
     	currentBuild.description = out_str
-	*/
+	
     }
     
     stage('Import webservice for truncate') {
