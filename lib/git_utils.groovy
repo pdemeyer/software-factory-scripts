@@ -34,6 +34,11 @@ def pushTags(String baseFolder) {
 	return result
 }
 
+def getLastCommitMessage(String baseFolder) {
+	//the first line of the stdout will (at least on Windows) return the command itself as well. Therefore, we skip the first line.
+    def message = bat(returnStdout: true, script: "git -C scripts log --pretty=format:%%s -1").trim().split('\n');
+    return message[1];
+}
 
 return this
 
