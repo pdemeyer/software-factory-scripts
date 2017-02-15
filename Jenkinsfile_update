@@ -63,11 +63,12 @@ node {
     }
     
     stage('Set build description') {
-    
+    /*
     	def out_str = gitUtils.getLastCommitMessage(exportOutputFolder)
     	echo out_str
     	
     	currentBuild.description = out_str
+    	*/
 	
     }
     
