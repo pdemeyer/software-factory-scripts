@@ -95,6 +95,7 @@ node {
 	}
       
    	stage ('Import solution on server') {
+         solutionimporter.importSolutions("${exportOutputFolder}/${webserviceSystemSolutionFile}", targetServerUrl, true)
    	     solutionimporter.importSolutions("${exportOutputFolder}/${deploymentCustomersSolutionFile}", targetServerUrl, false)
    	}
    
