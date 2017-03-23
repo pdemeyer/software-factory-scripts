@@ -82,7 +82,7 @@ def importSolutions(String solutionFilePath, String serverBaseUrl, boolean allow
     int result = client.executeMethod(post)
     println "Return code: ${result}"
     string body = post.getResponseBodyAsString();
-    println body;
+    //println body;
     if (body.indexOf("[error]") > -1) {
         currentBuild.result = 'FAILURE'
         throw new Exception()
