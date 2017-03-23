@@ -28,7 +28,7 @@ node {
    def solutionsToExport = "globis_deployment_customers,globis_framework,globis_webservice,globis_webservice_system"
    
    def versionInfoFilePath = "${workspaceSolutionsDir}/build_files/VersionInfo.txt"
-   
+   	
    def versionEnvironmentPrefix = "INT-"
    def versionNumber = ""
    def versionTag = "10.3.12-DEBUG"
