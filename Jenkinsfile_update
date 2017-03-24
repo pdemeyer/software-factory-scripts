@@ -29,11 +29,13 @@ node {
    def versionTag = "10.3.11-TST"
    def versionComment = "test comment"
    
-   def artefactsBranchName = env.artefactsBranchName 
+   def noTruncate = params.noTruncate 
+   
+   def artefactsBranchName = params.artefactsBranchName 
    def publishFilesPattern = '*.servoy'
    def releaseFilesPattern = "*.xml"
    
-   def targetServerUrl = env.targetServerUrl
+   def targetServerUrl = params.targetServerUrl
    
    def metadataSolutionFile = "globis_metadata.servoy"
    def webserviceSolutionFile = "globis_webservice.servoy"
@@ -73,6 +75,9 @@ node {
     }
     
     stage('Import webservice for truncate') {
+    if (noTruncate) {
+    }
+    else {
    		try {
         	solutionimporter.importSolutions("${exportOutputFolder}/${webserviceSystemSolutionFile}", targetServerUrl, true)
 		} catch (e) {
@@ -80,18 +85,31 @@ node {
     		currentBuild.result = "FAILED"
     		throw e
 		} 
+	}
    }
    
 	stage('Restart Servoy -1') {
-		servoyUtils.restartServer(targetServerUrl)
+		if (noTruncate) {
+    	}
+    	else {
+   			servoyUtils.restartServer(targetServerUrl)
+   		}
 	}
     
 	stage('Truncate Repository') {
-		servoyUtils.truncateRepositoryDb(targetServerUrl)
+		if (noTruncate) {
+    	}
+   		else {
+			servoyUtils.truncateRepositoryDb(targetServerUrl)
+		}
 	}
    
 	stage('Restart Servoy - 2') {
-		servoyUtils.restartServer(targetServerUrl)
+		if (noTruncate) {
+    	}
+    	else {
+			servoyUtils.restartServer(targetServerUrl)
+		}
 	}
       
    	stage ('Import solution on server') {
@@ -100,7 +118,11 @@ node {
    	}
    
 	stage('Restart Servoy - 3') {
-		servoyUtils.restartServer(targetServerUrl)
+		if (noTruncate) {
+    	}
+   		else {
+			servoyUtils.restartServer(targetServerUrl)
+		}
 	}
    
 } catch (e) {
