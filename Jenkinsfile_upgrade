@@ -170,8 +170,8 @@ D4609E70-CF43-4955-BA40-974FD7052608	verdupak
           checkout([$class: 'GitSCM', 
                     branches: [[name: "${artefactsBranchName}"]], 
                     doGenerateSubmoduleConfigurations: false, 
-                    extensions: [[$class: 'RelativeTargetDirectory', 
-                    relativeTargetDir: "${exportOutputFolder}"]], 
+                    extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: "${exportOutputFolder}"], 
+                			[$class: 'CheckoutOption', timeout: 20]], 
                     submoduleCfg: [], 
                     userRemoteConfigs: [[url: 'git@github_jenkins:globisnv/globis-artifacts.git']]])
     }	

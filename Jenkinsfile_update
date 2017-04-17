@@ -29,13 +29,13 @@ node {
    def versionTag = "10.3.11-TST"
    def versionComment = "test comment"
    
-   def noTruncate = params.noTruncate 
+   def noTruncate = env.noTruncate 
    
-   def artefactsBranchName = params.artefactsBranchName 
+   def artefactsBranchName = env.artefactsBranchName 
    def publishFilesPattern = '*.servoy'
    def releaseFilesPattern = "*.xml"
    
-   def targetServerUrl = params.targetServerUrl
+   def targetServerUrl = env.targetServerUrl
    
    def metadataSolutionFile = "globis_metadata.servoy"
    def webserviceSolutionFile = "globis_webservice.servoy"
@@ -47,9 +47,13 @@ node {
     stage('settings log') {
 	    slacknotifier.notifyBuild('STARTED')
 	
-        echo "${servoyHome}"
-        echo "${servoyDeveloperHome}"
-        echo "${workspaceSolutionsDir}"
+        echo "noTruncate: ${noTruncate}"
+        echo "artefacts: ${artefactsBranchName}"
+        echo "${noTruncate}"
+        echo "${noTruncate}"
+        echo "servoy home: ${servoyHome}"
+        echo "servoy dev home: ${servoyDeveloperHome}"
+        echo "workspace: ${workspaceSolutionsDir}"
         echo "${servoyPropertiesDir}"
         echo "${exportServoyProperties}"
    }
@@ -58,8 +62,8 @@ node {
           checkout([$class: 'GitSCM', 
                     branches: [[name: "${artefactsBranchName}"]], 
                     doGenerateSubmoduleConfigurations: false, 
-                    extensions: [[$class: 'RelativeTargetDirectory', 
-                    relativeTargetDir: "${exportOutputFolder}"]], 
+                    extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: "${exportOutputFolder}"], 
+                			[$class: 'CheckoutOption', timeout: 20]], 
                     submoduleCfg: [], 
                     userRemoteConfigs: [[url: 'git@github_jenkins:globisnv/globis-artifacts.git']]])
     }

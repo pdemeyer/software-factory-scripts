@@ -194,20 +194,25 @@ node {
       checkout([$class: 'GitSCM', 
                 branches: [[name: "${sourcesBranchName}"]], 
                 doGenerateSubmoduleConfigurations: false, 
-                extensions: [[$class: 'RelativeTargetDirectory', 
-                relativeTargetDir: 'globis_online_repo']], 
+                extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'globis_online_repo'], 
+                			[$class: 'CheckoutOption', timeout: 20]], 
                 submoduleCfg: [], 
                 userRemoteConfigs: [[url: 'git@github_jenkins:globisnv/globis-online.git']]])
    }
    
     stage('Sync artifacts GIT') { // for display purposes
+    	/*
+        bat script: "git -C ${exportOutputFolder} checkout -B \"${artefactsBranchName}\""
+        */
+        
           checkout([$class: 'GitSCM', 
                     branches: [[name: "${artefactsBranchName}"]], 
                     doGenerateSubmoduleConfigurations: false, 
-                    extensions: [[$class: 'RelativeTargetDirectory', 
-                    relativeTargetDir: "${exportOutputFolder}"]], 
+                    extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: "${exportOutputFolder}"], 
+                				 [$class: 'CheckoutOption', timeout: 20]], 
                     submoduleCfg: [], 
                     userRemoteConfigs: [[url: 'git@github_jenkins:globisnv/globis-artifacts.git']]])
+        
     }
     
     stage('Read configuration') {

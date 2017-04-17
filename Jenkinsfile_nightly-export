@@ -35,7 +35,6 @@ node {
    def versionTag = "10.3.12-DEBUG"
    def versionComment = "test comment"
    
-   //def sourcesBranchName = "*/10.3.12/10.3.12"
    def sourcesBranchName = env.sourcesBranchName  //  "*/master"
    def artefactsBranchName = env.artefactsBranchName  //   "master"
    def publishFilesPattern = '*.servoy'
@@ -203,8 +202,8 @@ node {
       checkout([$class: 'GitSCM', 
                 branches: [[name: "${sourcesBranchName}"]], 
                 doGenerateSubmoduleConfigurations: false, 
-                extensions: [[$class: 'RelativeTargetDirectory', 
-                relativeTargetDir: 'globis_online_repo']], 
+                extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'globis_online_repo'], 
+                			[$class: 'CheckoutOption', timeout: 20]], 
                 submoduleCfg: [], 
                 userRemoteConfigs: [[url: 'git@github_jenkins:globisnv/globis-online.git']]])
    }
@@ -213,8 +212,8 @@ node {
           checkout([$class: 'GitSCM', 
                     branches: [[name: "${artefactsBranchName}"]], 
                     doGenerateSubmoduleConfigurations: false, 
-                    extensions: [[$class: 'RelativeTargetDirectory', 
-                    relativeTargetDir: "${exportOutputFolder}"]], 
+                    extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: "${exportOutputFolder}"], 
+                			[$class: 'CheckoutOption', timeout: 20]], 
                     submoduleCfg: [], 
                     userRemoteConfigs: [[url: 'git@github_jenkins:globisnv/globis-artifacts.git']]])
     }
