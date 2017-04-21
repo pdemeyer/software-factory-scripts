@@ -63,6 +63,7 @@ node {
                     branches: [[name: "${artefactsBranchName}"]], 
                     doGenerateSubmoduleConfigurations: false, 
                     extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: "${exportOutputFolder}"], 
+                			[$class: 'CloneOption', timeout: 20],
                 			[$class: 'CheckoutOption', timeout: 20]], 
                     submoduleCfg: [], 
                     userRemoteConfigs: [[url: 'git@github_jenkins:globisnv/globis-artifacts.git']]])
